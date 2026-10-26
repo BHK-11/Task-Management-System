@@ -1,0 +1,54 @@
+HELP.md
+target/
+.venv/
+services/ai-api/.venv/
+work/preview-data/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Local tools, builds, previews, and Python caches
+/.agents/
+/.codex/
+/.diagram-design
+/node_modules/
+/work/
+**/__pycache__/
+*.py[cod]
+*.log
+*.mv.db
+.DS_Store
+Thumbs.db
+
+# Local service credentials and environment overrides
+.env
+.env.*
+!.env.example
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
