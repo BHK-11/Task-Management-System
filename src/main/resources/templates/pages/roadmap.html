@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/public :: layout(~{::title}, ~{::main}, 'inner-page')}">
+<head><title>TASK OS roadmap</title></head>
+<body><main id="main-content" class="inner-content roadmap-content">
+    <section class="inner-hero roadmap-hero"><p class="eyebrow"><span class="eyebrow-dot"></span> BUILT ONE PHASE AT A TIME</p><h1>A clear foundation.<br><span>Room to grow.</span></h1><p>TASK OS connects tasks, projects, time, goals, AI assistance, analytics, collaboration, and automation in one workspace. Advanced reporting and saved dashboard layouts remain future work.</p></section>
+    <section class="roadmap-current"><div class="roadmap-phase-mark"><span>14</span></div><div class="roadmap-current-copy"><p class="phase-label">CURRENT PHASE · IN PLACE</p><h2>UI foundation and application integration</h2><p>Responsive navigation, simple and advanced modes, accessible command search, and a unified shell across existing modules.</p></div><span class="phase-state">AVAILABLE</span></section>
+    <section class="roadmap-list" aria-label="Planned capabilities"><article class="roadmap-item" th:each="feature, iter : ${plannedFeatures}"><span class="roadmap-item-number" th:text="${#numbers.formatInteger(iter.count, 2)}">01</span><div><span class="roadmap-category" th:text="${feature.category}">Work management</span><h3 th:text="${feature.name}">Projects and shared workspaces</h3><p th:text="${feature.description}">Capability description</p></div><span class="planned-state">PLANNED</span></article></section>
+    <p class="roadmap-footnote"><span aria-hidden="true">ⓘ</span> Planned roadmap items are future direction. Available project and task features require a signed-in workspace.</p>
+</main></body></html>

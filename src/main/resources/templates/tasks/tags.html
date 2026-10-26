@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Tags — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content">
+    <header class="task-page-heading"><div><p class="eyebrow eyebrow-muted">ORGANIZE YOUR TASKS</p><h1>Tags</h1><p>Create labels that make tasks easier to find.</p></div><a class="button button-quiet" th:href="@{/tasks}">Back to tasks</a></header>
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div><div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <section class="task-card task-tag-create"><div class="task-section-heading"><div><p class="eyebrow eyebrow-muted">NEW LABEL</p><h2>Create a tag</h2></div></div>
+        <form class="task-component-form" method="post" th:action="@{/tags}" th:object="${tagForm}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><div class="form-field"><label for="new-tag-name">Name</label><input id="new-tag-name" type="text" maxlength="32" placeholder="e.g. Planning" th:field="*{name}" required><p class="field-error" th:errors="*{name}"></p></div><div class="form-field"><label for="new-tag-color">Color</label><select id="new-tag-color" th:field="*{color}"><option th:each="color : ${tagColors}" th:value="${color}" th:text="${#strings.capitalize(#strings.toLowerCase(color.name()))}"></option></select></div><button class="button button-primary" type="submit">Create tag</button><div class="task-form-errors" role="alert" th:if="${#fields.hasGlobalErrors()}"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}">Tag could not be saved.</p></div></form>
+    </section>
+    <section class="task-card task-tags-card"><div class="task-section-heading"><div><p class="eyebrow eyebrow-muted">YOUR LABELS</p><h2>All tags <span class="task-section-count" th:text="${#lists.size(tags)}">0</span></h2></div></div>
+        <p class="task-empty-inline" th:if="${#lists.isEmpty(tags)}">Tags you create will appear here.</p>
+        <ul class="task-tag-admin-list" th:unless="${#lists.isEmpty(tags)}"><li th:each="tag : ${tags}"><span class="task-tag" th:classappend="${' tag-' + #strings.toLowerCase(tag.color.name())}" th:text="${tag.name}">planning</span><form class="tag-edit-form" method="post" th:action="@{/tags/{id}(id=${tag.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label class="sr-only" th:for="${'tag-name-' + tag.id}">Tag name</label><input type="text" maxlength="32" name="name" th:id="${'tag-name-' + tag.id}" th:value="${tag.name}" required><label class="sr-only" th:for="${'tag-color-' + tag.id}">Tag color</label><select name="color" th:id="${'tag-color-' + tag.id}"><option th:each="color : ${tagColors}" th:value="${color}" th:selected="${color == tag.color}" th:text="${#strings.capitalize(#strings.toLowerCase(color.name()))}"></option></select><button class="button button-quiet" type="submit">Save</button></form><form method="post" th:action="@{/tags/{id}/delete(id=${tag.id})}" data-confirm="Delete this tag? Tasks will keep their other details."><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="text-button text-danger" type="submit">Delete</button></form></li></ul>
+    </section>
+</main>
+</body>
+</html>

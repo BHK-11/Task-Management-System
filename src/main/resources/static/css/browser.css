@@ -1,0 +1,46 @@
+.browser-studio-page { max-width: 1120px; padding-bottom: 56px; }
+.browser-welcome { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin: 8px 0 24px; }
+.browser-welcome h1 { margin: 3px 0 8px; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; }
+.browser-welcome p:not(.eyebrow) { max-width: 680px; margin: 0; color: var(--muted); line-height: 1.65; }
+.browser-mode-pill,.browser-status,.browser-count { display: inline-flex; align-items: center; gap: 7px; width: fit-content; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--surface-soft); font-size: .78rem; font-weight: 650; }
+.browser-mode-pill { flex: 0 0 auto; }
+.browser-mode-pill > span { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+.browser-panel { margin: 0 0 1rem; padding: clamp(18px, 3vw, 26px); border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow-soft); }
+.browser-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.browser-panel-heading .eyebrow { margin: 0 0 5px; font-size: 9px; }
+.browser-panel-heading h2 { margin: 0; font-size: 1.2rem; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.browser-status.is-ready { color: var(--green); border-color: color-mix(in srgb, var(--green) 34%, var(--line)); }
+.browser-status.is-offline { color: var(--muted); }
+.browser-status.is-denied,.browser-status.is-failed,.browser-error { color: #b42318; }
+:root[data-theme="dark"] .browser-status.is-denied,:root[data-theme="dark"] .browser-status.is-failed,:root[data-theme="dark"] .browser-error { color: #ff9f9f; }
+.browser-observe-form { display: grid; gap: .6rem; }
+.browser-observe-form > label { font-size: .9rem; font-weight: 650; }
+.browser-url-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: .6rem; }
+.browser-url-row input { min-width: 0; min-height: 46px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 11px; color: var(--ink); background: var(--surface); font: inherit; }
+.browser-url-row input:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 42%, transparent); outline-offset: 2px; }
+.browser-url-row button { min-height: 46px; }
+.browser-note,.browser-empty,.browser-setup-note { margin: .7rem 0 0; color: var(--muted); font-size: .9rem; line-height: 1.6; overflow-wrap: anywhere; }
+.browser-setup-note { padding: .75rem; border-radius: 10px; background: var(--surface-soft); }
+.browser-error { margin: 0 0 1rem; padding: .8rem 1rem; border: 1px solid color-mix(in srgb, #b42318 28%, var(--line)); border-radius: 12px; background: color-mix(in srgb, #b42318 6%, var(--surface)); font-size: .9rem; }
+.browser-observation h3 { margin: 1.3rem 0 .55rem; color: var(--ink-soft); font-size: 1rem; }
+.browser-headings { display: grid; gap: .35rem; margin: 0; padding-left: 1.2rem; color: var(--ink-soft); }
+.browser-visible-text { max-height: 460px; overflow: auto; margin: 0; padding: 14px; border: 1px solid var(--line); border-radius: 12px; color: var(--ink-soft); background: var(--surface-soft); font: inherit; font-size: .9rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.browser-untrusted-note { color: var(--muted); font-size: .82rem; line-height: 1.55; }
+.browser-history { display: grid; gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.browser-history-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-width: 0; padding: .85rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.browser-history-copy { display: grid; justify-items: start; gap: .35rem; min-width: 0; overflow-wrap: anywhere; }
+.browser-history-copy strong { color: var(--ink-soft); }
+.browser-history-title,.browser-history-copy small { color: var(--muted); font-size: .82rem; }
+.browser-history-item form { flex: 0 0 auto; }
+.browser-delete { min-height: 42px; }
+@media (max-width: 680px) {
+  .browser-welcome { align-items: flex-start; flex-direction: column; }
+  .browser-panel-heading { align-items: flex-start; flex-direction: column; }
+  .browser-url-row { grid-template-columns: 1fr; }
+  .browser-url-row button { width: 100%; min-height: 48px; }
+  .browser-history-item { align-items: flex-start; }
+  .browser-delete { min-width: 72px; min-height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .browser-studio-page * { scroll-behavior: auto; }
+}

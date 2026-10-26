@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Agents · TASK OS</title></head>
+<body><main id="main-content" class="workspace-content agent-management-page">
+    <header class="agent-management-heading">
+        <div><p class="eyebrow">AI OPERATIONS</p><h1>Agents</h1><p>See what TASK OS can do today and what is still being reviewed.</p></div>
+        <a class="button button-primary" th:href="@{/ai}">Open AI Copilot <span aria-hidden="true">→</span></a>
+    </header>
+
+    <section class="agent-current-card" aria-labelledby="current-planner-title">
+        <div class="agent-current-top"><div class="agent-provider-mark" aria-hidden="true">✦</div><div><p class="eyebrow">CURRENT PROVIDER</p><h2 id="current-planner-title">TASK OS planner</h2></div>
+            <span class="agent-state" th:classappend="${aiConfigured ? ' is-configured' : ''}"><i aria-hidden="true"></i><span th:text="${aiConfigured ? 'Settings present' : 'Setup required'}">Setup required</span></span></div>
+        <p class="agent-current-copy">The planner proposes personal task actions. TASK OS checks and saves tasks only after you approve the plan.</p>
+        <div class="agent-facts"><div><span>Can do</span><strong>Propose personal tasks</strong></div><div><span>Tools</span><strong>No direct agent tools</strong></div><div><span>Approval</span><strong>Required for every write</strong></div><div><span>Provider health</span><strong>Checked when a plan is submitted</strong></div></div>
+        <p class="agent-security-note">Provider settings are kept on the server. A configured URL and token do not prove the provider is reachable.</p>
+    </section>
+
+    <div class="agent-management-grid">
+        <section class="agent-panel agent-activity-panel" aria-labelledby="agent-activity-title">
+            <div class="agent-panel-heading"><div><p class="eyebrow eyebrow-muted">ACTIVITY &amp; RESULTS</p><h2 id="agent-activity-title">Recent plans</h2></div><a class="text-link" th:href="@{/ai}">Review all plans <span aria-hidden="true">→</span></a></div>
+            <p class="agent-muted-copy">Approved task outputs are verified by TASK OS and linked from each plan.</p>
+            <ul class="agent-plan-list">
+                <li th:each="plan : ${aiPlans}">
+                    <a class="agent-plan-link" th:href="@{/ai(planId=${plan.id})}"><span class="agent-plan-state" th:text="${#strings.replace(plan.status.name(), '_', ' ')}">PENDING APPROVAL</span><strong th:text="${plan.summary}">Plan summary</strong><small><span th:text="${plan.providerModel}">model</span><span aria-hidden="true"> · </span><time th:datetime="${plan.createdAt}" th:text="${#temporals.format(plan.createdAt, 'MMM d, yyyy · HH:mm')}">Date</time></small></a>
+                </li>
+                <li class="agent-empty-state" th:if="${#lists.isEmpty(aiPlans)}">No plans yet. When you create one in AI Copilot, its approval status and verified task results will appear here.</li>
+            </ul>
+            <div class="agent-job-note"><span class="agent-job-indicator" aria-hidden="true"></span><p><strong>Background jobs are not tracked yet.</strong> Planning runs synchronously; TASK OS does not currently expose running state, streaming or cancellation for agent jobs.</p></div>
+            <p class="agent-muted-copy">Failed provider calls are not saved as activity records, so there is no error history to show yet.</p>
+        </section>
+
+        <section class="agent-panel" aria-labelledby="agent-security-title">
+            <div class="agent-panel-heading"><div><p class="eyebrow eyebrow-muted">GUARDRAILS</p><h2 id="agent-security-title">Security &amp; budgets</h2></div></div>
+            <ul class="agent-control-list">
+                <li><span class="agent-control-mark" aria-hidden="true">✓</span><span><strong>Java owns permissions</strong><small>Every plan and task write is checked against the signed-in account.</small></span></li>
+                <li><span class="agent-control-mark" aria-hidden="true">✓</span><span><strong>Review before writing</strong><small>The planner cannot modify tasks or call application tools directly.</small></span></li>
+                <li><span class="agent-control-mark" aria-hidden="true">✓</span><span><strong>Bounded planning</strong><small>12 steps per plan, 10 plans per account each rolling day, and a 25-second provider timeout.</small></span></li>
+                <li><span class="agent-control-mark is-pending" aria-hidden="true">·</span><span><strong>No isolated agent runtime</strong><small>Hermes and browser workers stay disabled until per-run isolation is available.</small></span></li>
+            </ul>
+        </section>
+
+        <section class="agent-panel agent-provider-panel" aria-labelledby="other-providers-title">
+            <div class="agent-panel-heading"><div><p class="eyebrow eyebrow-muted">UNDER REVIEW</p><h2 id="other-providers-title">Other providers</h2></div><span class="agent-small-label">Not connected</span></div>
+            <div class="agent-provider-row"><div><strong>Hermes Agent</strong><small>Broad tool agent · optional first adapter</small></div><span class="agent-review-state">Sandbox required</span></div>
+            <div class="agent-provider-row"><div><strong>Browser Use</strong><small>Browser automation · authorized sites only</small></div><span class="agent-review-state">Isolated service needed</span></div>
+            <div class="agent-provider-row"><div><strong>OpenClaw &amp; OpenMausBot</strong><small>Full agent gateways with overlapping orchestration</small></div><span class="agent-review-state">Deferred</span></div>
+            <p class="agent-muted-copy">Hosted Dots and Grok Bot are products, not open-source TASK OS libraries. No supported adapter was verified in their reviewed public docs.</p>
+        </section>
+
+        <section class="agent-panel" aria-labelledby="agent-memory-title">
+            <div class="agent-panel-heading"><div><p class="eyebrow eyebrow-muted">MEMORY</p><h2 id="agent-memory-title">No TASK OS memory store</h2></div><span class="agent-small-label">Not connected</span></div>
+            <p class="agent-muted-copy">Codex development memory is separate. Product memory needs explicit consent, workspace permissions, revocation, deletion, retention and secret-redaction controls before it can be enabled.</p>
+            <p class="agent-memory-candidates"><strong>Evaluated:</strong> AgentMemory and OpenViking. Neither is currently authorized to read TASK OS user or workspace data.</p>
+        </section>
+    </div>
+</main></body></html>

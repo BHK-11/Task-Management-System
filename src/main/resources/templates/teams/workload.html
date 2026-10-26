@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Workload — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspace.id})}">← <span th:text="${workspace.name}">Workspace</span></a>
+    <header class="project-heading"><div><p class="eyebrow">SHARED WORKLOAD</p><h1>Workload</h1><p>Counts cover only open tasks assigned in this workspace. They do not include personal tasks or private calendar data.</p></div></header>
+    <section class="team-stat-grid" aria-label="Workload overview"><article class="team-stat"><span>Active members</span><strong th:text="${workload.size()}">0</strong><small>Current workspace members</small></article><article class="team-stat"><span>Unassigned work</span><strong th:text="${unassignedCount}">0</strong><small>Open shared tasks</small></article></section>
+    <section class="project-panel team-workload-panel">
+        <div class="team-workload-header"><h2>Assigned work by member</h2><p>Task-count limits are optional and set by the member or a workspace planner.</p></div>
+        <div class="team-table-wrap"><table class="team-workload-table"><thead><tr><th scope="col">Member</th><th scope="col">Open tasks</th><th scope="col">Due soon</th><th scope="col">Overdue</th><th scope="col">High priority</th><th scope="col">Capacity signal</th></tr></thead>
+            <tbody><tr th:each="row : ${workload}">
+                <th scope="row"><span th:text="${row.membership.user.displayName}">Member</span><small th:text="${row.membership.role}">MEMBER</small></th>
+                <td th:text="${row.openTasks}">0</td><td th:text="${row.dueSoon}">0</td><td th:text="${row.overdue}">0</td><td th:text="${row.highPriority}">0</td>
+                <td><span class="team-capacity-signal" th:classappend="${row.overLimit ? ' over-limit' : ''}" th:text="${row.signal}">No limit set</span>
+                    <form class="team-capacity-form" th:if="${canManage or row.membership.user.id == ownUserId}" method="post" th:action="@{/workspaces/{workspaceId}/members/{memberId}/capacity(workspaceId=${workspace.id},memberId=${row.membership.user.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label class="sr-only" th:for="${'capacity-' + row.membership.user.id}">Open task limit</label>
+                        <input type="number" min="1" max="500" name="maxOpenTasks" th:id="${'capacity-' + row.membership.user.id}" th:value="${row.membership.maxOpenTasks}" placeholder="No limit"><button class="button button-quiet button-small" type="submit">Save</button>
+                    </form>
+                </td>
+            </tr></tbody></table></div>
+        <p class="team-table-note">“Over limit” appears only when the member’s open assignment count exceeds their configured task-count limit. TASK OS does not equate task count with hours or performance.</p>
+    </section>
+</main></body></html>

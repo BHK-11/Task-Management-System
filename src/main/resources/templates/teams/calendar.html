@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Team calendar — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspace.id})}">← <span th:text="${workspace.name}">Workspace</span></a>
+    <header class="project-heading"><div><p class="eyebrow">SHARED DUE DATES</p><h1>Team calendar</h1><p>Due dates for tasks shared in this workspace. Personal calendar items are not included.</p></div></header>
+    <section class="team-calendar-panel" aria-labelledby="team-calendar-title">
+        <div class="team-calendar-toolbar">
+            <a class="button button-quiet" th:href="@{/workspaces/{id}/calendar(id=${workspace.id},month=${calendar.previousMonth})}" aria-label="Previous month">←</a>
+            <h2 id="team-calendar-title" th:text="${calendar.title}">Month year</h2>
+            <a class="button button-quiet" th:href="@{/workspaces/{id}/calendar(id=${workspace.id},month=${calendar.nextMonth})}" aria-label="Next month">→</a>
+        </div>
+        <div class="team-calendar-grid" role="grid" aria-labelledby="team-calendar-title">
+            <div class="team-calendar-weekday" role="columnheader">Mon</div><div class="team-calendar-weekday" role="columnheader">Tue</div><div class="team-calendar-weekday" role="columnheader">Wed</div><div class="team-calendar-weekday" role="columnheader">Thu</div><div class="team-calendar-weekday" role="columnheader">Fri</div><div class="team-calendar-weekday" role="columnheader">Sat</div><div class="team-calendar-weekday" role="columnheader">Sun</div>
+            <section class="team-calendar-day" role="gridcell" th:each="day : ${calendar.days}" th:classappend="${!day.inMonth ? ' is-outside-month' : ''} + (${day.today ? ' is-today' : ''})" th:attr="aria-label=${#temporals.format(day.date, 'EEEE, MMMM d') + (day.tasks.isEmpty() ? '' : ', ' + day.tasks.size() + ' due tasks')}">
+                <time class="team-calendar-date" th:datetime="${day.date}" th:text="${day.date.dayOfMonth}">1</time>
+                <ul class="team-calendar-events"><li th:each="task : ${day.tasks}"><a th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${workspace.id},taskId=${task.id})}" th:text="${task.title}" th:attr="title=${task.title}">Task title</a><small th:text="${#strings.replace(task.status.name(), '_', ' ')}">TODO</small></li></ul>
+            </section>
+        </div>
+    </section>
+</main></body></html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(pageTitle, pageContent)" th:attr="data-account-theme=${accountTheme}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b1220">
+    <meta name="description" content="Secure access to your TASK OS account.">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/taskos-mark.svg}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/app.js}"></script>
+    <title th:replace="${pageTitle}">TASK OS account</title>
+</head>
+<body class="auth-page">
+<a class="skip-link" href="#auth-main">Skip to sign in form</a>
+<main id="auth-main" class="auth-shell" th:replace="${pageContent}"></main>
+</body>
+</html>

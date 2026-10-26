@@ -1,0 +1,126 @@
+<section class="task-workspace-detail task-card" th:fragment="executionDetail(detail, workspaceUrl, previousTaskUrl, nextTaskUrl, statuses, priorities, activeFocusSession, selectedProjectId, dependencies, suffix)" data-task-workspace-detail th:attr="aria-labelledby=${'workspace-task-title-' + suffix},data-task-id=${detail.task.id}">
+    <header class="task-workspace-header">
+        <div>
+            <p class="eyebrow eyebrow-muted">SELECTED TASK</p>
+            <div class="task-meta-badges">
+                <span class="task-state" th:classappend="${' state-' + #strings.toLowerCase(detail.task.status.name())}" th:text="${#strings.replace(detail.task.status.name(), '_', ' ')}">TO DO</span>
+                <span class="task-priority" th:classappend="${' priority-' + #strings.toLowerCase(detail.task.priority.name())}" th:text="${detail.task.priority}">MEDIUM</span>
+                <span class="task-state state-archived" th:if="${detail.task.archivedAt != null}">ARCHIVED</span>
+            </div>
+            <h2 th:id="${'workspace-task-title-' + suffix}" th:text="${detail.task.title}">Prepare release notes</h2>
+            <p class="task-workspace-due" th:classappend="${detail.overdue ? ' due-overdue' : ''}" th:text="${detail.task.dueDate == null ? 'No due date' : 'Due ' + #temporals.format(detail.task.dueDate, 'MMM d, yyyy')}">Due date</p>
+        </div>
+        <nav class="task-workspace-next" aria-label="Move between tasks">
+            <a class="button button-quiet" th:if="${previousTaskUrl != null}" th:href="${previousTaskUrl}" aria-label="Previous task">←</a>
+            <a class="button button-quiet" th:if="${nextTaskUrl != null}" th:href="${nextTaskUrl}" aria-label="Next task">→</a>
+        </nav>
+    </header>
+
+    <div class="task-workspace-actions" th:if="${detail.task.archivedAt == null}">
+        <a class="button button-primary" th:href="@{/ai(taskId=${detail.task.id})}">AI Assist</a>
+        <form th:if="${activeFocusSession == null}" method="post" th:action="@{/focus/start}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="taskId" th:value="${detail.task.id}"><input type="hidden" name="mode" value="POMODORO">
+            <input type="hidden" name="focusMinutes" value="25"><input type="hidden" name="shortBreakMinutes" value="5"><input type="hidden" name="longBreakMinutes" value="15">
+            <input type="hidden" name="returnTo" value="task-workspace"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+            <button class="button button-quiet" type="submit">Start focus</button>
+        </form>
+        <form th:if="${activeFocusSession != null and activeFocusSession.taskId == detail.task.id}" method="post" th:action="@{/focus/sessions/{id}/stop(id=${activeFocusSession.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="returnTo" value="task-workspace"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+            <button class="button button-quiet" type="submit">Stop focus</button>
+        </form>
+        <a class="button button-quiet" th:if="${activeFocusSession != null and activeFocusSession.taskId != detail.task.id}" th:href="@{/time}">A focus session is active</a>
+        <a class="button button-quiet" th:href="@{/tasks/{id}/edit(id=${detail.task.id})}">Full edit</a>
+    </div>
+
+    <form class="task-workspace-status" th:if="${detail.task.archivedAt == null}" method="post" th:action="@{/tasks/{id}/status(id=${detail.task.id})}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+        <label th:for="${'workspace-status-' + suffix}">Status</label>
+        <select name="status" th:id="${'workspace-status-' + suffix}"><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == detail.task.status}" th:text="${#strings.replace(status.name(), '_', ' ')}">TO DO</option></select>
+        <button class="button button-quiet" type="submit">Save status</button>
+    </form>
+
+    <details class="task-workspace-metadata" th:if="${detail.task.archivedAt == null}">
+        <summary>Edit priority and deadline</summary>
+        <form class="task-workspace-metadata-form" method="post" th:action="@{/tasks/{id}(id=${detail.task.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="title" th:value="${detail.task.title}"><input type="hidden" name="description" th:value="${detail.task.description}">
+            <input type="hidden" name="status" th:value="${detail.task.status}"><input type="hidden" name="startDate" th:value="${detail.task.startDate}">
+            <input type="hidden" name="version" th:value="${detail.task.version}"><input type="hidden" name="tagIds" th:each="tag : ${detail.task.tags}" th:value="${tag.id}">
+            <input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+            <label th:for="${'workspace-priority-' + suffix}">Priority
+                <select name="priority" th:id="${'workspace-priority-' + suffix}"><option th:each="priority : ${priorities}" th:value="${priority}" th:selected="${priority == detail.task.priority}" th:text="${priority}">MEDIUM</option></select>
+            </label>
+            <label th:for="${'workspace-deadline-' + suffix}">Deadline
+                <input type="date" name="dueDate" th:id="${'workspace-deadline-' + suffix}" th:value="${detail.task.dueDate}">
+            </label>
+            <button class="button button-quiet" type="submit">Save task details</button>
+        </form>
+    </details>
+
+    <section class="task-workspace-notes" th:attr="aria-labelledby=${'workspace-notes-title-' + suffix}">
+        <div class="task-section-heading"><div><p class="eyebrow eyebrow-muted">DESCRIPTION &amp; NOTES</p><h3 th:id="${'workspace-notes-title-' + suffix}">Task notes</h3></div></div>
+        <p class="task-description" th:if="${!#strings.isEmpty(detail.task.description)}" th:text="${detail.task.description}">Task description</p>
+        <p class="muted-text" th:if="${#strings.isEmpty(detail.task.description)}">No description or notes yet.</p>
+        <details th:if="${detail.task.archivedAt == null}">
+            <summary>Edit notes</summary>
+            <form class="task-workspace-note-form" method="post" th:action="@{/tasks/{id}(id=${detail.task.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="title" th:value="${detail.task.title}"><input type="hidden" name="status" th:value="${detail.task.status}"><input type="hidden" name="priority" th:value="${detail.task.priority}">
+                <input type="hidden" name="startDate" th:value="${detail.task.startDate}"><input type="hidden" name="dueDate" th:value="${detail.task.dueDate}"><input type="hidden" name="version" th:value="${detail.task.version}">
+                <input type="hidden" name="tagIds" th:each="tag : ${detail.task.tags}" th:value="${tag.id}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+                <label th:for="${'workspace-description-' + suffix}">Description and notes<textarea name="description" maxlength="6000" rows="4" th:id="${'workspace-description-' + suffix}" th:text="${detail.task.description}"></textarea></label>
+                <button class="button button-quiet" type="submit">Save notes</button>
+            </form>
+        </details>
+    </section>
+
+    <section class="task-workspace-subtasks" th:if="${detail.task.parent == null}" th:attr="aria-labelledby=${'workspace-subtasks-title-' + suffix}" data-subtask-workspace>
+        <div class="task-section-heading">
+            <div><p class="eyebrow eyebrow-muted">NEXT ACTIONS</p><h3 th:id="${'workspace-subtasks-title-' + suffix}">Subtasks <span class="task-section-count" data-subtask-count th:text="${detail.completedSubtaskCount() + ' / ' + #lists.size(detail.subtasks)}">0 / 0</span></h3></div>
+            <div class="task-subtask-view-actions" th:if="${!#lists.isEmpty(detail.subtasks)}"><button type="button" class="text-button" data-expand-subtasks>Expand all</button><button type="button" class="text-button" data-collapse-subtasks>Collapse all</button></div>
+        </div>
+        <div class="task-workspace-progress" role="progressbar" th:if="${!#lists.isEmpty(detail.subtasks)}" aria-label="Subtask progress" aria-valuemin="0" th:aria-valuemax="${#lists.size(detail.subtasks)}" th:aria-valuenow="${detail.completedSubtaskCount()}" data-subtask-progress>
+            <span data-progress-fill th:style="${'width:' + (100 * detail.completedSubtaskCount() / #lists.size(detail.subtasks)) + '%'}"></span>
+        </div>
+        <p class="task-subtask-error" role="alert" hidden data-subtask-error></p>
+        <p class="muted-text" th:if="${#lists.isEmpty(detail.subtasks)}">No subtasks yet. Add the next concrete step below.</p>
+        <ol class="task-workspace-subtask-list" th:unless="${#lists.isEmpty(detail.subtasks)}" data-subtask-list>
+            <li th:each="subtask, iter : ${detail.subtasks}" th:classappend="${subtask.status.name() == 'COMPLETED' ? ' is-complete' : ''}" th:attr="data-subtask-id=${subtask.id}">
+                <form class="task-subtask-toggle" method="post" th:action="@{/tasks/{parentId}/subtasks/{childId}/toggle(parentId=${detail.task.id},childId=${subtask.id})}" data-subtask-toggle>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="status" th:value="${subtask.status.name() == 'COMPLETED' ? 'TODO' : 'COMPLETED'}">
+                    <label class="task-subtask-checkbox-label" th:for="${'subtask-check-' + subtask.id + '-' + suffix}"><input type="checkbox" data-subtask-checkbox th:id="${'subtask-check-' + subtask.id + '-' + suffix}" th:checked="${subtask.status.name() == 'COMPLETED'}" th:aria-label="${(subtask.status.name() == 'COMPLETED' ? 'Mark incomplete: ' : 'Mark complete: ') + subtask.title}"><span class="sr-only">Complete subtask</span></label>
+                </form>
+                <div class="task-workspace-subtask-copy"><span class="task-workspace-subtask-title" th:text="${subtask.title}">Draft outline</span><span class="task-priority" th:classappend="${' priority-' + #strings.toLowerCase(subtask.priority.name())}" th:text="${subtask.priority}">MEDIUM</span></div>
+                <details class="task-subtask-edit" th:if="${subtask.archivedAt == null and detail.task.archivedAt == null}">
+                    <summary>Edit</summary>
+                    <form class="task-subtask-edit-form" method="post" th:action="@{/tasks/{parentId}/subtasks/{childId}(parentId=${detail.task.id},childId=${subtask.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+                        <label th:for="${'subtask-title-' + subtask.id + '-' + suffix}">Subtask title<input name="title" maxlength="160" required th:id="${'subtask-title-' + subtask.id + '-' + suffix}" th:value="${subtask.title}"></label>
+                        <label th:for="${'subtask-priority-' + subtask.id + '-' + suffix}">Priority<select name="priority" th:id="${'subtask-priority-' + subtask.id + '-' + suffix}"><option th:each="priority : ${priorities}" th:value="${priority}" th:selected="${priority == subtask.priority}" th:text="${priority}">MEDIUM</option></select></label>
+                        <button class="button button-quiet" type="submit">Save subtask</button>
+                    </form>
+                </details>
+                <div class="task-subtask-order" th:if="${detail.task.archivedAt == null and subtask.archivedAt == null}">
+                    <form method="post" th:action="@{/tasks/{parentId}/subtasks/{childId}/move(parentId=${detail.task.id},childId=${subtask.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}"><input type="hidden" name="direction" value="UP"><button type="submit" class="text-button" th:disabled="${iter.first}" aria-label="Move subtask up">↑</button></form>
+                    <form method="post" th:action="@{/tasks/{parentId}/subtasks/{childId}/move(parentId=${detail.task.id},childId=${subtask.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}"><input type="hidden" name="direction" value="DOWN"><button type="submit" class="text-button" th:disabled="${iter.last}" aria-label="Move subtask down">↓</button></form>
+                </div>
+                <form class="task-subtask-delete" th:if="${detail.task.archivedAt == null and subtask.archivedAt == null}" method="post" th:action="@{/tasks/{parentId}/subtasks/{childId}/delete(parentId=${detail.task.id},childId=${subtask.id})}" data-confirm="Delete this subtask?"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}"><button type="submit" class="text-button text-danger">Delete</button></form>
+            </li>
+        </ol>
+        <form class="task-workspace-add-subtask" th:if="${detail.task.archivedAt == null}" method="post" th:action="@{/tasks/{id}/subtasks(id=${detail.task.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="workspaceUrl" th:value="${workspaceUrl}">
+            <label th:for="${'new-subtask-' + suffix}">Add a subtask<input name="title" maxlength="160" required th:id="${'new-subtask-' + suffix}" placeholder="What is one concrete step?"></label>
+            <label th:for="${'new-subtask-priority-' + suffix}">Priority<select name="priority" th:id="${'new-subtask-priority-' + suffix}"><option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority}" th:selected="${priority.name() == 'MEDIUM'}">MEDIUM</option></select></label>
+            <button class="button button-primary" type="submit">Add subtask</button>
+        </form>
+    </section>
+
+    <section class="task-workspace-dependencies" th:attr="aria-labelledby=${'workspace-dependencies-title-' + suffix}">
+        <div class="task-section-heading"><div><p class="eyebrow eyebrow-muted">SCHEDULE CONTEXT</p><h3 th:id="${'workspace-dependencies-title-' + suffix}">Dependencies</h3></div><a class="task-open-link" th:if="${selectedProjectId != null}" th:href="@{/projects/{id}/dependencies(id=${selectedProjectId})}">Project links</a></div>
+        <ul class="task-dependency-list" th:if="${!#lists.isEmpty(dependencies)}"><li th:each="dependency : ${dependencies}"><span th:text="${dependency.predecessorId == detail.task.id ? 'Precedes' : 'Blocked by'}">Blocked by</span><a th:if="${dependency.predecessorId == detail.task.id}" th:href="@{/tasks/{id}(id=${dependency.successorId})}" th:text="${dependency.successorTitle}">Successor</a><a th:unless="${dependency.predecessorId == detail.task.id}" th:href="@{/tasks/{id}(id=${dependency.predecessorId})}" th:text="${dependency.predecessorTitle}">Predecessor</a><small th:text="${dependency.type + (dependency.lagDays > 0 ? ' · ' + dependency.lagDays + 'd lag' : '')}">FS</small></li></ul>
+        <p class="muted-text" th:if="${#lists.isEmpty(dependencies)}">No project dependencies are linked to this task.</p>
+    </section>
+
+    <section class="task-workspace-attachments" th:attr="aria-labelledby=${'workspace-attachments-title-' + suffix}"><div class="task-section-heading"><div><p class="eyebrow eyebrow-muted">REFERENCE FILES</p><h3 th:id="${'workspace-attachments-title-' + suffix}">Attachments</h3></div></div><p class="muted-text">Task attachments are not available in this workspace yet.</p></section>
+</section>

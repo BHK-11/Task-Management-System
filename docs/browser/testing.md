@@ -1,0 +1,3 @@
+# Browser tests
+
+Run the isolated worker tests with `services/browser-worker/.venv/Scripts/python.exe -m unittest discover -s tests -v` from `services/browser-worker`. They cover origin and request policy, service authentication, URL restrictions, and visible DOM extraction in real headless Chromium using a controlled in-memory page. Java tests cover URL validation, authenticated page rendering, and owner-scoped history. The tests do not start a controlled HTTPS site through the worker endpoint, establish container isolation or DNS-rebinding protection, verify external-site reliability, or exercise the Java-to-worker request end to end.

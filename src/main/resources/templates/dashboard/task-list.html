@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${taskPage.title + ' — TASK OS'}">My Day — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content dashboard-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <header class="dashboard-view-heading"><div><p class="eyebrow">PERSONAL TASK VIEW</p><h1 th:text="${taskPage.title}">My Day</h1><p th:text="${taskPage.description}">Your relevant active tasks.</p></div><a class="button button-primary" th:href="@{/tasks/new}">+ New task</a></header>
+    <section class="dashboard-panel dashboard-list-panel" th:attr="aria-label=${taskPage.title}">
+        <div th:replace="~{dashboard/fragments :: taskList(${taskPage.tasks}, ${returnTo})}"></div>
+        <div class="dashboard-empty-copy" th:if="${#lists.isEmpty(taskPage.tasks)}"><h2 th:text="${taskPage.emptyTitle}">Nothing due today</h2><p th:text="${taskPage.emptyDescription}">No task currently matches this view.</p><div class="dashboard-inline-links"><a th:href="@{/tasks/upcoming}">Upcoming tasks</a><a th:href="@{/tasks(due='NO_DATE')}">Unscheduled tasks</a><a th:href="@{/tasks/new}">Create a task</a></div></div>
+    </section>
+    <div class="dashboard-inline-links" th:if="${returnTo == 'my-day'}"><a th:href="@{/tasks(due='NO_DATE')}">Review unscheduled tasks</a><a th:href="@{/tasks}">All tasks</a></div>
+    <nav class="dashboard-pagination" th:if="${taskPage.hasPrevious or taskPage.hasNext}" aria-label="Task pages"><a th:if="${taskPage.hasPrevious}" th:href="@{${returnTo == 'my-day' ? '/my-day' : (returnTo == 'today' ? '/tasks/today' : (returnTo == 'tomorrow' ? '/tasks/tomorrow' : '/tasks/overdue'))}(page=${taskPage.page - 1})}">← Previous</a><span th:text="${'Page ' + (taskPage.page + 1)}">Page 1</span><a th:if="${taskPage.hasNext}" th:href="@{${returnTo == 'my-day' ? '/my-day' : (returnTo == 'today' ? '/tasks/today' : (returnTo == 'tomorrow' ? '/tasks/tomorrow' : '/tasks/overdue'))}(page=${taskPage.page + 1})}">Next →</a></nav>
+    <p class="dashboard-page-footnote">Dashboard views count top-level tasks; subtasks are shown as progress on their parent.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>AI model settings — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content account-content ai-model-settings">
+    <section class="workspace-welcome account-welcome"><div><p class="eyebrow eyebrow-muted">AI GATEWAY</p><h1>AI model settings</h1><p>Choose how TASK OS selects a model for your plans and work requests.</p></div><a class="phase-pill account-phase-link" th:href="@{/ai}">AI Copilot <span aria-hidden="true">→</span></a></section>
+    <p class="account-notice" role="status" th:if="${aiPreferenceNotice}" th:text="${aiPreferenceNotice}">Preferences saved.</p>
+    <section class="account-card" aria-labelledby="routing-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">PERSONAL ROUTING</p><h2 id="routing-title">Model selection</h2></div></div>
+        <form th:action="@{/settings/ai}" method="post" th:object="${preferencesForm}" class="account-form">
+            <div class="form-field"><label for="mode">AI mode</label><select id="mode" th:field="*{mode}"><option th:each="mode : ${modes}" th:value="${mode.name()}" th:text="${#strings.capitalize(#strings.toLowerCase(mode.name()))}">Auto</option></select><p class="field-hint">Automatic modes use the configured target for that mode, or the server default. No unmeasured model rankings are presented. Private mode requires local Ollama.</p><p class="field-error" th:errors="*{mode}"></p></div>
+            <div class="form-field"><label for="target">Specific model <span class="field-optional">(manual mode)</span></label><select id="target" th:field="*{target}"><option value="">Choose a provider and model</option><option th:each="target : ${modelTargets}" th:value="${target.value}" th:text="${target.label}">Provider · model</option><option th:if="${savedTargetMissing}" th:value="${savedTarget}" th:text="${'Saved selection · ' + savedTarget}">Saved model</option></select><p class="field-hint">The list comes from provider model-discovery APIs. TASK OS verifies the selected model again when it handles a request.</p><p class="field-error" th:errors="*{target}"></p></div>
+            <label class="ai-policy-toggle"><input type="checkbox" th:field="*{allowCloudProcessing}"><span><strong>Allow cloud processing</strong><small>When off, only an approved localhost Ollama model can receive your request.</small></span></label>
+            <label class="ai-policy-toggle"><input type="checkbox" th:field="*{allowFallback}"><span><strong>Allow one automatic fallback</strong><small>Only on a temporary provider outage, and only to a server-configured target. This may send the request to another provider allowed by your cloud setting.</small></span></label>
+            <div class="account-actions"><button type="submit" class="button button-primary">Save AI preferences</button><a class="button button-quiet" th:href="@{/settings/account}">Account settings</a></div>
+        </form>
+    </section>
+    <section class="account-card" aria-labelledby="providers-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">LIVE DISCOVERY</p><h2 id="providers-title">Provider status</h2></div></div>
+        <p class="account-copy" th:text="${modelCatalog.capabilityNote}">Model capability notes.</p>
+        <ul class="ai-provider-list" th:if="${modelCatalog.providers != null}"><li th:each="provider : ${modelCatalog.providers}"><strong th:text="${#strings.capitalize(provider.id)}">Provider</strong><span class="ai-provider-state" th:text="${#strings.replace(provider.status, '_', ' ')}">Not configured</span><small th:if="${provider.models != null}" th:text="${#lists.size(provider.models) + ' models listed'}">0 models listed</small></li></ul>
+        <p class="field-hint">Credentials stay in the AI service environment; this page never accepts or displays API keys. A provider is not marked available unless its authenticated model listing succeeds.</p>
+    </section>
+    <section class="account-card" aria-labelledby="usage-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">ACTUAL USAGE · UTC</p><h2 id="usage-title">This month</h2></div></div>
+        <ul class="ai-provider-list">
+            <li><strong>Plans</strong><span th:text="${#numbers.formatInteger(usage.plans(), 1, 'COMMA')}">0</span></li>
+            <li><strong>Input tokens</strong><span th:text="${#numbers.formatInteger(usage.inputTokens(), 1, 'COMMA')}">0</span></li>
+            <li><strong>Output tokens</strong><span th:text="${#numbers.formatInteger(usage.outputTokens(), 1, 'COMMA')}">0</span></li>
+        </ul>
+        <p class="field-hint">Totals come from saved AI plans. Cost is unknown because no provider pricing rates are configured.</p>
+    </section>
+</main>
+</body>
+</html>

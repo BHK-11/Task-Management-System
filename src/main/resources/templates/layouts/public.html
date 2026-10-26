@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(pageTitle, pageContent, pageClass)" th:attr="data-account-theme=${accountTheme}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fc">
+    <meta name="description" content="TASK OS is a calm, intelligent foundation for organizing work and making progress.">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/taskos-mark.svg}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:if="${pageClass == 'home-page'}" th:href="@{/css/home.css}">
+    <script th:src="@{/js/app.js}"></script>
+    <script th:if="${pageClass == 'home-page'}" th:src="@{/vendor/gsap.min.js}" defer></script>
+    <script th:if="${pageClass == 'home-page'}" th:src="@{/vendor/ScrollTrigger.min.js}" defer></script>
+    <script th:if="${pageClass == 'home-page'}" th:src="@{/vendor/motion.js}" defer></script>
+    <script th:if="${pageClass == 'home-page'}" th:src="@{/js/home.js}" defer></script>
+    <title th:replace="${pageTitle}">TASK OS</title>
+</head>
+<body th:class="${pageClass}">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div th:replace="~{fragments/public-header :: header}"></div>
+<main id="main-content" th:replace="${pageContent}"></main>
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

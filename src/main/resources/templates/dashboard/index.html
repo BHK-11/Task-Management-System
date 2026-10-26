@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Dashboard — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content dashboard-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <header class="dashboard-welcome">
+        <div>
+            <p class="eyebrow">PERSONAL COMMAND CENTER</p>
+            <h1><span th:text="${overview.greeting}">Good morning</span>, <span th:text="${currentUser.displayName}">Aditya</span>.</h1>
+            <p>Here’s what needs your attention today.</p>
+        </div>
+        <div class="dashboard-date"><span aria-hidden="true">◷</span><time th:datetime="${overview.today}" th:text="${overview.displayDate}">Tuesday, October 20</time></div>
+    </header>
+
+    <section class="dashboard-productivity-strip" aria-label="Productivity shortcuts">
+        <a th:href="@{/productivity/daily(date=${overview.today})}"><span class="eyebrow">DAILY FOCUS</span><strong th:text="${productivityPlan.frogTask != null ? productivityPlan.frogTask.title : #lists.size(productivityPlanEntries) + ' tasks planned'}">Open today's plan</strong><small th:text="${productivityPlan.frogTask != null ? 'Your selected Eat the Frog task' : (productivityPlan.mode == 'IVY_LEE' ? 'Ivy Lee · up to six tasks' : '1-3-5 · one big, three medium, five small')}">Ivy Lee</small></a>
+        <a th:href="@{/productivity/gtd}"><span class="eyebrow">GTD INBOX</span><strong th:text="${productivityInboxCount}">0</strong><small>Captures to clarify</small></a>
+        <a class="dashboard-productivity-link" th:href="@{/productivity}">Open productivity methods <span aria-hidden="true">→</span></a>
+        <a th:href="@{/projects}"><span class="eyebrow">PROJECTS</span><strong th:text="${activeProjectCount}">0</strong><small>Active project workspaces</small></a>
+    </section>
+
+    <section class="dashboard-productivity-strip" aria-label="Goals and habit shortcuts">
+        <a th:href="@{/goals}"><span class="eyebrow">LONG-TERM GOALS</span><strong th:text="${activeGoalCount}">0</strong><small>Active goals and real progress</small></a>
+        <a th:href="@{/okrs}"><span class="eyebrow">OKR CYCLES</span><strong>Objectives</strong><small>Review measurable key results</small></a>
+        <a th:href="@{/habits}"><span class="eyebrow">REPEATED BEHAVIOR</span><strong th:text="${activeHabitCount}">0</strong><small>Active habits and streaks</small></a>
+        <a class="dashboard-productivity-link" th:href="@{/reviews/weekly}">Open this week’s review <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section class="dashboard-time-card" aria-label="Today's schedule"><div><p class="eyebrow">TIME &amp; FOCUS</p><strong th:text="${todaySchedule.events.size()}">0</strong><span>items scheduled today</span></div><p>Task deadlines, project milestones, and reserved work blocks from your local calendar.</p><a class="button button-quiet" th:href="@{/calendar(view='day',date=${todaySchedule.selectedDate})}">View today's schedule</a></section>
+
+    <section class="dashboard-empty-state" th:if="${!overview.hasTasks()}" aria-labelledby="dashboard-empty-title">
+        <span class="dashboard-empty-icon" aria-hidden="true">✦</span>
+        <div><p class="eyebrow">YOUR PERSONAL WORKSPACE</p><h2 id="dashboard-empty-title">Your workspace is ready.</h2><p>Create your first task to start organizing your day.</p></div>
+        <div class="dashboard-empty-actions"><a class="button button-primary" th:href="@{/tasks/new}">Create your first task</a><a class="button button-quiet" th:href="@{/tasks}">Explore task manager</a></div>
+    </section>
+
+    <th:block th:if="${overview.hasTasks()}">
+        <section class="dashboard-metrics" aria-label="Task overview">
+            <a class="dashboard-metric" th:href="@{/tasks/today}"><span>Due today</span><strong th:text="${overview.metrics.dueTodayCount}">0</strong><small>Active tasks scheduled for today</small></a>
+            <a class="dashboard-metric" th:href="@{/tasks/upcoming}"><span>Upcoming</span><strong th:text="${overview.metrics.dueNextSevenDaysCount}">0</strong><small>Next 7 days, excluding today</small></a>
+            <a class="dashboard-metric dashboard-metric-overdue" th:href="@{/tasks/overdue}"><span>Overdue</span><strong th:text="${overview.metrics.overdueCount}">0</strong><small>Active tasks due before today</small></a>
+            <div class="dashboard-metric"><span>Completed</span><strong th:text="${overview.metrics.completedLastSevenDaysCount}">0</strong><small>Last 7 local days, still marked complete</small></div>
+        </section>
+
+        <section class="dashboard-secondary-metrics" aria-label="Additional task counts">
+            <span><strong th:text="${overview.metrics.activeTaskCount}">0</strong> active top-level tasks</span>
+            <a th:href="@{/tasks(due='NO_DATE')}"><strong th:text="${overview.metrics.unscheduledCount}">0</strong> without a due date</a>
+            <a th:href="@{/tasks/tomorrow}"><strong th:text="${overview.metrics.dueTomorrowCount}">0</strong> due tomorrow</a>
+        </section>
+
+        <div class="dashboard-grid dashboard-grid-main">
+            <section class="dashboard-panel dashboard-my-day" aria-labelledby="my-day-heading">
+                <div class="dashboard-panel-heading"><div><p class="eyebrow">FOCUS</p><h2 id="my-day-heading">My Day</h2><p>Overdue and due-today tasks first, then urgent and high-priority work.</p></div><a class="dashboard-text-link" th:href="@{/my-day}">Open My Day <span aria-hidden="true">→</span></a></div>
+                <div th:replace="~{dashboard/fragments :: taskList(${overview.myDay}, 'dashboard')}"></div>
+                <p class="dashboard-list-empty" th:if="${#lists.isEmpty(overview.myDay)}">No overdue, due-today, or high-priority active tasks.</p>
+                <div class="dashboard-inline-links"><a th:href="@{/tasks(due='NO_DATE')}">Review unscheduled tasks</a><a th:href="@{/tasks}">All tasks</a></div>
+            </section>
+            <section class="dashboard-panel dashboard-priorities" aria-labelledby="priorities-heading">
+                <div class="dashboard-panel-heading"><div><p class="eyebrow">HIGH PRIORITY</p><h2 id="priorities-heading">Top priorities</h2><p>Urgent work, followed by high-priority tasks.</p></div><a class="dashboard-text-link" th:href="@{/tasks(sort='PRIORITY')}">View all <span aria-hidden="true">→</span></a></div>
+                <div th:replace="~{dashboard/fragments :: taskList(${overview.priorities}, 'dashboard')}"></div>
+                <p class="dashboard-list-empty" th:if="${#lists.isEmpty(overview.priorities)}">No high-priority active tasks.</p>
+            </section>
+        </div>
+
+        <div class="dashboard-grid dashboard-grid-support">
+            <section class="dashboard-panel" aria-labelledby="upcoming-heading">
+                <div class="dashboard-panel-heading"><div><p class="eyebrow">DEADLINES</p><h2 id="upcoming-heading">Coming up</h2><p>Next due dates after today.</p></div><a class="dashboard-text-link" th:href="@{/tasks/upcoming}">All upcoming <span aria-hidden="true">→</span></a></div>
+                <div th:replace="~{dashboard/fragments :: taskList(${overview.upcoming}, 'dashboard')}"></div>
+                <p class="dashboard-list-empty" th:if="${#lists.isEmpty(overview.upcoming)}">No future due dates yet.</p>
+            </section>
+            <section class="dashboard-panel" aria-labelledby="activity-heading">
+                <div class="dashboard-panel-heading"><div><p class="eyebrow">TASK HISTORY</p><h2 id="activity-heading">Recent activity</h2><p>Latest recorded task changes.</p></div><a class="dashboard-text-link" th:href="@{/tasks}">Task manager <span aria-hidden="true">→</span></a></div>
+                <ol class="dashboard-activity-list">
+                    <li th:each="event : ${overview.recentActivity}"><span class="activity-dot" aria-hidden="true"></span><div><a th:if="${event.taskAvailable()}" th:href="@{/tasks/{id}(id=${event.taskId})}" th:text="${event.taskTitle}">Task name</a><span th:unless="${event.taskAvailable()}" th:text="${event.summary}">Task changed</span><p th:if="${event.taskAvailable()}" th:text="${event.summary}">Task completed</p><time th:datetime="${event.occurredAt}" th:text="${#temporals.format(event.occurredAt, 'MMM d · h:mm a')}">Oct 20 · 9:30 AM</time></div></li>
+                    <li class="dashboard-list-empty" th:if="${#lists.isEmpty(overview.recentActivity)}">No task activity has been recorded.</li>
+                </ol>
+            </section>
+        </div>
+
+        <section class="dashboard-panel dashboard-chart-panel" aria-labelledby="completion-heading">
+            <div class="dashboard-panel-heading"><div><p class="eyebrow">COMPLETION ACTIVITY</p><h2 id="completion-heading">Completed in the last 7 days</h2><p>Currently completed tasks, grouped by completion date in your local timezone.</p></div><span class="dashboard-chart-total"><strong th:text="${overview.metrics.completedLastSevenDaysCount}">0</strong><small>currently complete</small></span></div>
+            <div class="dashboard-chart" role="img" aria-label="Current completed task counts across the last seven local calendar days.">
+                <div class="dashboard-chart-column" th:each="point : ${overview.completionTrend}" aria-hidden="true"><span class="dashboard-chart-count" th:text="${point.taskCount}">0</span><span class="dashboard-chart-track"><span class="dashboard-chart-bar" th:style="${'height:' + point.barHeight + '%'}"></span></span><span class="dashboard-chart-day" th:text="${point.dayLabel}">Mon</span></div>
+            </div>
+            <table class="sr-only"><caption>Current completed task counts by local calendar day</caption><thead><tr><th>Date</th><th>Tasks currently complete</th></tr></thead><tbody><tr th:each="point : ${overview.completionTrend}"><td th:text="${#temporals.format(point.date, 'EEEE, MMMM d')}">Monday, October 19</td><td th:text="${point.taskCount}">0</td></tr></tbody></table>
+            <p class="dashboard-chart-note">A task is counted only while it remains marked complete. Reopening clears its completion date.</p>
+        </section>
+
+        <section class="dashboard-panel dashboard-recent-completions" aria-labelledby="recent-completions-heading">
+            <div class="dashboard-panel-heading"><div><p class="eyebrow">CURRENTLY COMPLETE</p><h2 id="recent-completions-heading">Recently completed</h2><p>Reopen a task if it needs more work.</p></div><a class="dashboard-text-link" th:href="@{/tasks(status='COMPLETED')}">Completed tasks <span aria-hidden="true">→</span></a></div>
+            <div th:replace="~{dashboard/fragments :: taskList(${overview.recentlyCompleted}, 'dashboard')}"></div>
+            <p class="dashboard-list-empty" th:if="${#lists.isEmpty(overview.recentlyCompleted)}">No tasks are currently marked complete.</p>
+        </section>
+
+        <section class="dashboard-panel dashboard-quick-add" aria-labelledby="quick-add-heading">
+            <div class="dashboard-panel-heading"><div><p class="eyebrow">QUICK ACTION</p><h2 id="quick-add-heading">Add a task</h2><p>Creates a regular TASK OS task using the same task service.</p></div><a class="dashboard-text-link" th:href="@{/tasks/new}">More details <span aria-hidden="true">→</span></a></div>
+            <form class="dashboard-quick-form" method="post" th:action="@{/tasks}" th:object="${taskForm}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="returnTo" value="dashboard">
+                <div class="form-field dashboard-quick-title"><label for="quick-task-title">Task title</label><input id="quick-task-title" type="text" maxlength="160" placeholder="What needs to get done?" th:field="*{title}" required></div>
+                <div class="form-field"><label for="quick-task-priority">Priority</label><select id="quick-task-priority" th:field="*{priority}"><option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority}">MEDIUM</option></select></div>
+                <div class="form-field"><label for="quick-task-due">Due date <span class="muted-text">(optional)</span></label><input id="quick-task-due" type="date" th:field="*{dueDate}"></div>
+                <button class="button button-primary" type="submit">Add task</button>
+            </form>
+        </section>
+    </th:block>
+</main>
+</body>
+</html>

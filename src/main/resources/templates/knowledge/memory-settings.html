@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Memory settings — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content account-content memory-page">
+    <section class="workspace-welcome account-welcome">
+        <div><p class="eyebrow eyebrow-muted">KNOWLEDGE &amp; CONTEXT</p><h1>Memory settings</h1><p>Choose what TASK OS can recall between sessions. Only details you explicitly add here are saved as personal memory.</p></div>
+        <a class="phase-pill account-phase-link" th:href="@{/ai}">AI Copilot <span aria-hidden="true">→</span></a>
+    </section>
+    <p class="account-notice" role="status" th:if="${memoryNotice}" th:text="${memoryNotice}">Memory settings updated.</p>
+    <section class="account-card" aria-labelledby="consent-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">YOUR CONTROL</p><h2 id="consent-title">Persistent memory</h2></div><span class="memory-state" th:classappend="${preference.enabled ? 'is-enabled' : ''}" th:text="${preference.enabled ? 'On' : 'Off'}">Off</span></div>
+        <p class="account-copy">When enabled, TASK OS may include relevant memories you confirmed in an AI request to personalize future work. Your AI model routing and cloud-processing setting still apply. Memory is lower priority than your current instruction and current task or project records.</p>
+        <form th:action="@{/settings/memory/consent}" method="post" class="memory-consent-form">
+            <input type="hidden" name="enabled" th:value="${!preference.enabled}">
+            <button type="submit" class="button" th:classappend="${preference.enabled ? 'button-quiet' : 'button-primary'}" th:text="${preference.enabled ? 'Turn memory off' : 'Turn memory on'}">Turn memory on</button>
+            <p class="field-hint" th:if="${preference.consentedAt != null}">Last enabled <time th:datetime="${preference.consentedAt}" th:text="${#temporals.format(preference.consentedAt, 'MMM d, yyyy HH:mm')} + ' UTC'">date</time></p>
+        </form>
+        <p class="field-hint">Do not save passwords, API keys, financial account details, or other secrets. Disabling memory stops retrieval; saved items stay here until you delete them.</p>
+    </section>
+    <section class="account-card" aria-labelledby="add-memory-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">CONFIRM EACH ITEM</p><h2 id="add-memory-title">Add a personal memory</h2></div></div>
+        <form th:action="@{/settings/memory}" method="post" th:object="${memoryForm}" class="account-form memory-form">
+            <div class="form-field"><label for="memory-category">Category</label><select id="memory-category" th:field="*{category}"><option th:each="category : ${categories}" th:value="${category.name()}" th:text="${#strings.replace(#strings.capitalize(#strings.toLowerCase(category.name())), '_', ' ')}">Preference</option></select><p class="field-error" th:errors="*{category}"></p></div>
+            <div class="form-field"><label for="memory-content">What should TASK OS remember?</label><textarea id="memory-content" th:field="*{content}" maxlength="2000" rows="3" placeholder="Example: I prefer concise project updates with clear next steps."></textarea><p class="field-hint">Personal work preferences and stable context only. Up to 2,000 characters.</p><p class="field-error" th:errors="*{content}"></p></div>
+            <div class="account-actions"><button type="submit" class="button button-primary" th:disabled="${!preference.enabled}">Save confirmed memory</button><span class="field-hint" th:if="${!preference.enabled}">Turn memory on first.</span></div>
+        </form>
+    </section>
+    <section class="account-card" aria-labelledby="saved-memories-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">REVIEW &amp; DELETE</p><h2 id="saved-memories-title">Saved memories</h2></div><span class="memory-count" th:text="${#lists.size(memories)} + ' active'">0 active</span></div>
+        <p class="memory-empty" th:if="${#lists.isEmpty(memories)}">No memories saved yet. AI suggestions are not stored automatically.</p>
+        <ul class="memory-list" th:if="${!#lists.isEmpty(memories)}">
+            <li th:each="memory : ${memories}" class="memory-item">
+                <div class="memory-item-copy"><span class="memory-category" th:text="${#strings.replace(#strings.capitalize(#strings.toLowerCase(memory.category.name())), '_', ' ')}">Preference</span><p th:text="${memory.content}">Memory content</p><small>Confirmed by you · <time th:datetime="${memory.confirmedAt}" th:text="${#temporals.format(memory.confirmedAt, 'MMM d, yyyy HH:mm')} + ' UTC'">date</time></small></div>
+                <div class="memory-item-actions">
+                    <details><summary class="button button-quiet">Correct</summary><form th:action="@{/settings/memory/{id}/correct(id=${memory.id})}" method="post" class="memory-correct-form"><label th:for="${'category-' + memory.id}">Category</label><select th:id="${'category-' + memory.id}" name="category"><option th:each="category : ${categories}" th:value="${category.name()}" th:selected="${category == memory.category}" th:text="${#strings.replace(#strings.capitalize(#strings.toLowerCase(category.name())), '_', ' ')}">Preference</option></select><label th:for="${'content-' + memory.id}">Corrected memory</label><textarea th:id="${'content-' + memory.id}" name="content" maxlength="2000" required th:text="${memory.content}"></textarea><button type="submit" class="button button-primary" th:disabled="${!preference.enabled}">Save correction</button></form></details>
+                    <form th:action="@{/settings/memory/{id}/delete(id=${memory.id})}" method="post"><button type="submit" class="button button-quiet">Delete</button></form>
+                </div>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

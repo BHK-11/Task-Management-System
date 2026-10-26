@@ -1,0 +1,6 @@
+package com.taskos.ai.dto;
+
+public enum AiActionType {
+    CREATE_TASK, GENERATE_DOCX, GENERATE_PDF, GENERATE_XLSX, GENERATE_PPTX,
+    DRAFT_EMAIL, DRAFT_MESSAGE, UNSUPPORTED
+}

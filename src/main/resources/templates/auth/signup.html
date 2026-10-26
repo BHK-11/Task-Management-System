@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/auth :: layout(~{::title}, ~{::main})}">
+<head><title>Create your account — TASK OS</title></head>
+<body>
+<main class="auth-shell">
+    <section class="auth-brand-panel" aria-label="About TASK OS">
+        <a class="brand auth-brand" th:href="@{/}" aria-label="TASK OS home">
+            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><path d="M18 2.8 32 10.9v14.2L18 33.2 4 25.1V10.9L18 2.8Z"/><path d="m11.1 18.2 4.4 4.3 9.7-10"/></svg></span>
+            <span class="brand-copy"><strong>TASK<span> OS</span></strong><small>Work, with intention</small></span>
+        </a>
+        <div class="auth-brand-copy">
+            <p class="auth-overline">A clearer way to work</p>
+            <h1>Organize Everything.<br>Execute Intelligently.<br><span>Achieve More.</span></h1>
+            <p>Build a more organized way to work, one thoughtful step at a time.</p>
+        </div>
+        <div class="auth-orbit auth-orbit-one" aria-hidden="true"></div><div class="auth-orbit auth-orbit-two" aria-hidden="true"></div>
+        <div class="auth-brand-foot"><span class="auth-foot-mark" aria-hidden="true">✳</span><span>Your account is private and yours.</span></div>
+    </section>
+    <section class="auth-form-panel">
+        <div class="auth-toolbar"><a class="auth-back-link" th:href="@{/}">← <span>Back to TASK OS</span></a><label th:if="${currentUser == null}" class="theme-control auth-theme"><span class="theme-icon" aria-hidden="true">◐</span><span class="sr-only">Color theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>
+        <div class="auth-card auth-card-signup">
+            <p class="auth-eyebrow">A GOOD PLACE TO BEGIN</p>
+            <h2>Create Your TASK OS Account</h2>
+            <p class="auth-subtitle">Build a more organized way to work.</p>
+            <form th:action="@{/signup}" method="post" class="auth-form" data-auth-form th:object="${signupForm}">
+                <div class="form-error-summary" role="status" aria-live="polite" th:if="${#fields.hasAnyErrors()}">Please review the highlighted fields.</div>
+                <div class="form-field">
+                    <label for="displayName">Full name</label>
+                    <input id="displayName" type="text" autocomplete="name" maxlength="80" required th:field="*{displayName}" th:attr="aria-invalid=${#fields.hasErrors('displayName')}" aria-describedby="displayName-error">
+                    <p class="field-error" id="displayName-error" th:errors="*{displayName}"></p>
+                </div>
+                <div class="form-field">
+                    <label for="email">Email address</label>
+                    <input id="email" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required th:field="*{email}" th:attr="aria-invalid=${#fields.hasErrors('email')}" aria-describedby="email-error">
+                    <p class="field-error" id="email-error" th:errors="*{email}"></p>
+                </div>
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <div class="password-input-wrap"><input id="password" type="password" autocomplete="new-password" minlength="12" maxlength="256" required th:field="*{password}" th:attr="aria-invalid=${#fields.hasErrors('password')}" aria-describedby="password-help password-error"><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="password" data-password-toggle>Show</button></div>
+                    <p class="field-hint" id="password-help">Use at least 12 characters. A long passphrase is welcome.</p>
+                    <p class="field-error" id="password-error" th:errors="*{password}"></p>
+                </div>
+                <div class="form-field">
+                    <label for="confirmPassword">Confirm password</label>
+                    <div class="password-input-wrap"><input id="confirmPassword" type="password" autocomplete="new-password" maxlength="256" required th:field="*{confirmPassword}" th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')}" aria-describedby="confirmPassword-error"><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="confirmPassword" data-password-toggle>Show</button></div>
+                    <p class="field-error" id="confirmPassword-error" th:errors="*{confirmPassword}"></p>
+                </div>
+                <button type="submit" class="button button-primary auth-submit" data-submit-button><span data-submit-label data-working-label="Creating account…">Create account</span><span aria-hidden="true">→</span></button>
+            </form>
+            <p class="auth-switch">Already have an account? <a th:href="@{/login}">Sign in</a></p>
+        </div>
+        <p class="auth-legal-note">By creating an account, you agree to keep your sign-in details private.</p>
+    </section>
+</main>
+</body>
+</html>

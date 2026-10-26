@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Your profile — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content account-content">
+    <section class="workspace-welcome account-welcome"><div><p class="eyebrow eyebrow-muted">YOUR ACCOUNT</p><h1>Your profile</h1><p>Manage the identity and sign-in details connected to TASK OS.</p></div><span class="phase-pill"><span class="phase-pill-dot"></span> Private account</span></section>
+    <p class="account-notice" role="status" th:if="${param.updated}">Your profile was updated.</p>
+    <section class="account-card" aria-labelledby="profile-details-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">PROFILE DETAILS</p><h2 id="profile-details-title">Your information</h2></div><span class="user-avatar user-avatar-large" aria-hidden="true" th:text="${#strings.substring(profile.displayName, 0, 1).toUpperCase()}">A</span></div>
+        <form th:action="@{/profile}" method="post" th:object="${displayNameForm}" class="account-form" data-auth-form>
+            <div class="form-field"><label for="displayName">Display name</label><input id="displayName" type="text" autocomplete="name" maxlength="80" required th:field="*{displayName}" th:attr="aria-invalid=${#fields.hasErrors('displayName')}" aria-describedby="displayName-error"><p class="field-error" id="displayName-error" th:errors="*{displayName}"></p></div>
+            <div class="form-field"><label for="email">Email address</label><input id="email" type="email" th:value="${profile.email}" readonly aria-describedby="email-note"><p class="field-hint" id="email-note">Email changes require a verification flow and are not available yet.</p></div>
+            <div class="account-actions"><button type="submit" class="button button-primary" data-submit-button><span data-submit-label data-working-label="Saving…">Save profile</span></button><a class="button button-quiet" th:href="@{/settings/account}">Account settings</a></div>
+        </form>
+    </section>
+    <section class="account-card account-facts" aria-labelledby="account-status-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">ACCOUNT STATUS</p><h2 id="account-status-title">Account information</h2></div><span class="status-pill" th:text="${profile.status}">ACTIVE</span></div>
+        <dl class="account-facts-list"><div><dt>Created</dt><dd th:text="${profile.createdAt}">2026-01-01T00:00:00Z</dd></div><div><dt>Last successful sign in</dt><dd th:text="${profile.lastLoginAt != null ? profile.lastLoginAt : 'Not recorded yet'}">Not recorded yet</dd></div></dl>
+        <a class="text-link" th:href="@{/settings/security}">Review security settings <span aria-hidden="true">→</span></a>
+    </section>
+</main>
+</body>
+</html>

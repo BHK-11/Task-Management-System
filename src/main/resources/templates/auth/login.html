@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/auth :: layout(~{::title}, ~{::main})}">
+<head><title>Sign in — TASK OS</title></head>
+<body>
+<main class="auth-shell">
+    <section class="auth-brand-panel" aria-label="About TASK OS">
+        <a class="brand auth-brand" th:href="@{/}" aria-label="TASK OS home">
+            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><path d="M18 2.8 32 10.9v14.2L18 33.2 4 25.1V10.9L18 2.8Z"/><path d="m11.1 18.2 4.4 4.3 9.7-10"/></svg></span>
+            <span class="brand-copy"><strong>TASK<span> OS</span></strong><small>Work, with intention</small></span>
+        </a>
+        <div class="auth-brand-copy">
+            <p class="auth-overline">A clearer way to work</p>
+            <h1>Organize Everything.<br>Execute Intelligently.<br><span>Achieve More.</span></h1>
+            <p>Your plans, priorities, and progress belong in one considered workspace.</p>
+        </div>
+        <div class="auth-orbit auth-orbit-one" aria-hidden="true"></div><div class="auth-orbit auth-orbit-two" aria-hidden="true"></div>
+        <div class="auth-brand-foot"><span class="auth-foot-mark" aria-hidden="true">✳</span><span>Thoughtfully built for your next step.</span></div>
+    </section>
+    <section class="auth-form-panel">
+        <div class="auth-toolbar"><a class="auth-back-link" th:href="@{/}">← <span>Back to TASK OS</span></a><label th:if="${currentUser == null}" class="theme-control auth-theme"><span class="theme-icon" aria-hidden="true">◐</span><span class="sr-only">Color theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div>
+        <div class="auth-card">
+            <p class="auth-eyebrow">YOUR WORKSPACE AWAITS</p>
+            <h2>Welcome Back to TASK OS</h2>
+            <p class="auth-subtitle">Your organized workspace is waiting.</p>
+            <p class="auth-notice" role="status" th:if="${param.registered}">Your account is ready. Sign in to continue.</p>
+            <p class="auth-notice" role="status" th:if="${param.passwordChanged}">Your password was updated. Sign in again with your new password.</p>
+            <p class="auth-notice" role="status" th:if="${param.logout}">You have signed out.</p>
+            <p class="auth-notice" role="status" th:if="${param.expired}">Your session expired. Sign in to continue.</p>
+            <p class="auth-error" role="alert" th:if="${param.error}">Email or password was incorrect. Please try again.</p>
+            <form th:action="@{/login}" method="post" class="auth-form" data-auth-form>
+                <div class="form-field">
+                    <label for="email">Email address</label>
+                    <input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" maxlength="254" required autofocus>
+                </div>
+                <div class="form-field">
+                    <div class="field-label-row"><label for="password">Password</label></div>
+                    <div class="password-input-wrap"><input id="password" name="password" type="password" autocomplete="current-password" maxlength="256" required><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="password" data-password-toggle>Show</button></div>
+                </div>
+                <button type="submit" class="button button-primary auth-submit" data-submit-button><span data-submit-label data-working-label="Signing in…">Sign in</span><span aria-hidden="true">→</span></button>
+            </form>
+            <p class="auth-switch">New to TASK OS? <a th:href="@{/signup}">Create an account</a></p>
+        </div>
+        <p class="auth-legal-note">Secure, server-managed sign-in. Your password is never stored in your browser.</p>
+    </section>
+</main>
+</body>
+</html>

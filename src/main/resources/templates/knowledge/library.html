@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Knowledge library — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content knowledge-library-page">
+    <section class="workspace-welcome knowledge-welcome">
+        <div><p class="eyebrow eyebrow-muted">KNOWLEDGE &amp; CONTEXT</p><h1>Knowledge library</h1><p>Upload source documents, find exact passages, and follow citations back to their page, slide, sheet, or line.</p></div>
+        <a class="phase-pill account-phase-link" th:href="@{/settings/memory}">Memory settings <span aria-hidden="true">→</span></a>
+    </section>
+    <p class="account-notice" role="status" th:if="${knowledgeNotice}" th:text="${knowledgeNotice}">Document updated.</p>
+    <p class="knowledge-error" role="alert" th:if="${knowledgeError}" th:text="${knowledgeError}">The document could not be indexed.</p>
+    <section class="knowledge-panel" aria-labelledby="upload-title">
+        <div class="knowledge-panel-heading"><div><p class="eyebrow eyebrow-muted">PRIVATE SOURCE FILES</p><h2 id="upload-title">Add a document</h2></div></div>
+        <form th:action="@{/knowledge/upload}" method="post" enctype="multipart/form-data" class="knowledge-upload-form">
+            <label for="knowledge-file">Choose PDF, DOCX, XLSX, PPTX, TXT, or Markdown</label>
+            <input id="knowledge-file" name="file" type="file" accept=".pdf,.docx,.xlsx,.pptx,.txt,.md,application/pdf" required>
+            <p class="knowledge-note">Up to 10 MB. TASK OS extracts selectable text through the configured private extraction service; it does not send files to a language model. Scanned-image OCR is not available. Original files are stored outside the public web directory.</p>
+            <button type="submit" class="button button-primary">Upload and index</button>
+        </form>
+    </section>
+    <section class="knowledge-panel" aria-labelledby="search-title">
+        <div class="knowledge-panel-heading"><div><p class="eyebrow eyebrow-muted">OWNER-SCOPED SEARCH</p><h2 id="search-title">Search indexed text</h2></div></div>
+        <form th:action="@{/knowledge}" method="get" class="knowledge-search-form">
+            <label class="sr-only" for="knowledge-query">Search document text</label>
+            <input id="knowledge-query" type="search" name="q" maxlength="120" th:value="${query}" placeholder="Find a phrase in your documents…">
+            <button type="submit" class="button button-primary">Search</button>
+        </form>
+        <p class="knowledge-note">Search currently matches exact phrases in extracted text. Each result includes its source location and document version.</p>
+        <p class="knowledge-empty" th:if="${!#strings.isEmpty(query) and #lists.isEmpty(results)}">No matching passages in your currently indexed documents.</p>
+        <ol class="knowledge-results" th:if="${!#lists.isEmpty(results)}">
+            <li th:each="result : ${results}" class="knowledge-result">
+                <div class="knowledge-result-heading"><strong th:text="${result.fileName}">Roadmap.pdf</strong><span>v<span th:text="${result.version}">1</span></span></div>
+                <p class="knowledge-citation"><span th:text="${result.locator}">Page 4</span> · Source citation</p>
+                <blockquote th:text="${result.excerpt}">Relevant extracted text</blockquote>
+                <a th:href="@{/knowledge/{id}/download(id=${result.documentId})}">Download source file <span aria-hidden="true">↗</span></a>
+            </li>
+        </ol>
+    </section>
+    <section class="knowledge-panel" aria-labelledby="documents-title">
+        <div class="knowledge-panel-heading"><div><p class="eyebrow eyebrow-muted">DOCUMENT VERSIONS</p><h2 id="documents-title">Your files</h2></div></div>
+        <p class="knowledge-empty" th:if="${#lists.isEmpty(documents)}">No documents uploaded yet.</p>
+        <ul class="knowledge-document-list" th:if="${!#lists.isEmpty(documents)}">
+            <li th:each="document : ${documents}" class="knowledge-document">
+                <div class="knowledge-document-main">
+                    <a class="knowledge-document-title" th:href="@{/knowledge/{id}/download(id=${document.id})}" th:text="${document.fileName}">Document.pdf</a>
+                    <p><span th:text="${document.format.toUpperCase()}">PDF</span> · version <span th:text="${document.version}">1</span> · <span th:text="${#numbers.formatInteger(document.size, 1, 'COMMA')} + ' bytes'">0 bytes</span></p>
+                    <span class="knowledge-status" th:classappend="${document.indexState.name() == 'INDEXED' ? 'is-ready' : (document.indexState.name() == 'FAILED' ? 'is-failed' : '')}" th:text="${document.indexState.name() == 'INDEXED' ? (document.currentVersion ? 'Indexed · current' : 'Indexed · older version') : document.indexState.name()}">Indexed</span>
+                    <p class="knowledge-failure" th:if="${document.failureMessage != null}" th:text="${document.failureMessage}">Indexing failed.</p>
+                </div>
+                <div class="knowledge-document-actions">
+                    <form th:if="${document.indexState.name() == 'FAILED'}" th:action="@{/knowledge/{id}/retry(id=${document.id})}" method="post"><button class="button button-quiet" type="submit">Retry indexing</button></form>
+                    <form th:action="@{/knowledge/{id}/delete(id=${document.id})}" method="post"><button class="button button-quiet" type="submit">Delete version</button></form>
+                </div>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

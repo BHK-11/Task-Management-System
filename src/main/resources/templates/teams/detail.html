@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Workspace — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <a class="project-back-link" th:href="@{/teams}">← All workspaces</a>
+    <header class="project-heading team-heading">
+        <div><p class="eyebrow">SHARED WORKSPACE <span class="team-role" th:text="${currentMembership.role}">OWNER</span></p><h1 th:text="${workspace.name}">Workspace</h1><p th:text="${#strings.isEmpty(workspace.description) ? 'A shared space for projects, tasks and team updates.' : workspace.description}">Workspace description</p></div>
+        <div class="team-heading-actions"><a class="button button-quiet" th:href="@{/workspaces/{id}/calendar(id=${workspace.id})}">Team calendar</a><a class="button button-quiet" th:href="@{/workspaces/{id}/members(id=${workspace.id})}">Members</a><a class="button button-quiet" th:href="@{/workspaces/{id}/workload(id=${workspace.id})}">Workload</a></div>
+    </header>
+    <div class="team-stat-grid" aria-label="Workspace summary">
+        <article class="team-stat"><span>Members</span><strong th:text="${members.size()}">0</strong><small>Active accounts</small></article>
+        <article class="team-stat"><span>Shared projects</span><strong th:text="${projects.size()}">0</strong><small>Explicitly shared</small></article>
+        <article class="team-stat"><span>Open tasks</span><strong th:text="${tasks.size()}">0</strong><small>Latest 100 shown</small></article>
+        <article class="team-stat"><span>Unassigned</span><strong th:text="${unassignedCount}">0</strong><small>Ready to distribute</small></article>
+    </div>
+    <section class="team-section">
+        <div class="team-section-head"><div><p class="eyebrow">PROJECTS</p><h2>Shared projects</h2></div></div>
+        <div class="team-list-card" th:if="${!projects.empty}">
+            <a class="team-list-row" th:each="project : ${projects}" th:href="@{/workspaces/{workspaceId}/projects/{projectId}(workspaceId=${workspace.id},projectId=${project.id})}">
+                <span class="team-project-mark" th:style="'--project-color:' + ${project.color}" aria-hidden="true"></span>
+                <span class="team-list-copy"><strong th:text="${project.name}">Project</strong><small th:text="${#strings.isEmpty(project.description) ? 'Shared project' : project.description}">Description</small></span>
+                <span class="team-role" th:text="${#strings.replace(project.status.name(), '_', ' ')}">ACTIVE</span><span aria-hidden="true">→</span>
+            </a>
+        </div>
+        <div class="team-empty-inline" th:if="${projects.empty}"><strong>No shared projects yet</strong><span>A project owner can review and share an existing project below.</span></div>
+        <div class="team-shareable" th:if="${canManage and !shareableProjects.empty}">
+            <h3>Projects you own</h3><p>Review exactly what will become visible before sharing.</p>
+            <div class="team-chip-list"><a class="team-chip" th:each="project : ${shareableProjects}" th:href="@{/projects/{id}/share(id=${project.id},workspaceId=${workspace.id})}"><span th:text="${project.name}">Project</span><span aria-hidden="true">↗</span></a></div>
+        </div>
+    </section>
+    <section class="team-section">
+        <div class="team-section-head"><div><p class="eyebrow">TEAM TASKS</p><h2>Shared work</h2></div><a class="team-text-link" th:href="@{/assigned-to-me}">Assigned to me →</a></div>
+        <form class="team-create-task" th:if="${canEdit and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{id}/tasks(id=${workspace.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label class="sr-only" for="team-task-title">Task title</label><input id="team-task-title" name="title" maxlength="160" required placeholder="Add a shared task">
+            <label class="sr-only" for="team-task-priority">Priority</label><select id="team-task-priority" name="priority"><option value="MEDIUM">Medium priority</option><option value="HIGH">High priority</option><option value="URGENT">Urgent</option><option value="LOW">Low priority</option></select>
+            <label class="sr-only" for="team-task-due">Due date</label><input id="team-task-due" type="date" name="dueDate" aria-label="Due date">
+            <button class="button button-primary" type="submit">Add task</button>
+        </form>
+        <div class="team-task-list" th:if="${!tasks.empty}">
+            <article class="team-task-row" th:each="task : ${tasks}">
+                <span class="team-task-priority" th:classappend="' priority-' + ${#strings.toLowerCase(task.priority.name())}" aria-hidden="true"></span>
+                <span class="team-list-copy"><a class="team-task-title" th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${workspace.id},taskId=${task.id})}" th:text="${task.title}">Task title</a><small><span th:text="${#strings.replace(task.status.name(), '_', ' ')}">TODO</span><span th:if="${task.dueDate != null}" th:text="${' · due ' + #temporals.format(task.dueDate, 'MMM d')}">· due date</span></small></span>
+                <span class="team-role" th:text="${task.priority}">MEDIUM</span>
+            </article>
+        </div>
+        <div class="team-empty-inline" th:if="${tasks.empty}"><strong>No shared tasks yet</strong><span>Create a task here or share a project with eligible tasks.</span></div>
+    </section>
+    <section class="team-section team-two-column">
+        <div><div class="team-section-head"><div><p class="eyebrow">ACTIVITY</p><h2>Recent updates</h2></div></div>
+            <ol class="team-activity-list" th:if="${!activities.empty}"><li th:each="event : ${activities}"><span class="team-activity-dot" aria-hidden="true"></span><div><strong th:text="${activityActors[event.actorId] ?: 'Former member'}">Member</strong><p th:text="${event.summary}">Workspace update</p><time th:text="${#temporals.format(event.occurredAt, 'MMM d, yyyy · HH:mm')}">Today</time></div></li></ol>
+            <div class="team-empty-inline" th:if="${activities.empty}"><strong>No activity yet</strong><span>Workspace changes will appear here.</span></div>
+        </div>
+        <div><div class="team-section-head"><div><p class="eyebrow">YOUR INBOX</p><h2>Recent notifications</h2></div><a class="team-text-link" th:href="@{/notifications}">View all →</a></div>
+            <div class="team-notification-list" th:if="${!notifications.empty}"><a th:each="item : ${notifications}" th:classappend="${item.readAt == null ? 'unread' : ''}" th:href="${item.taskId != null ? '/workspaces/' + workspace.id + '/tasks/' + item.taskId : '/notifications'}"><span class="notification-dot" aria-hidden="true"></span><span><strong th:text="${item.title}">Notification</strong><small th:text="${#temporals.format(item.deliveredAt, 'MMM d · HH:mm')}">Time</small></span></a></div>
+            <div class="team-empty-inline" th:if="${notifications.empty}"><strong>All caught up</strong><span>Assignments and mentions will appear here.</span></div>
+        </div>
+    </section>
+    <section class="project-panel team-settings-panel" th:if="${canManage}">
+        <div class="team-section-head"><div><p class="eyebrow">SETTINGS</p><h2>Workspace details</h2></div></div>
+        <form class="team-form team-settings-form" method="post" th:action="@{/workspaces/{id}/settings(id=${workspace.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="team-name">Name</label><input id="team-name" name="name" maxlength="100" required th:value="${workspace.name}">
+            <label for="team-description">Description</label><textarea id="team-description" name="description" rows="3" maxlength="1000" th:text="${workspace.description}"></textarea>
+            <button class="button button-quiet" type="submit" th:disabled="${workspace.status.name() != 'ACTIVE'}">Save settings</button>
+        </form>
+        <form th:if="${currentMembership.role.name() == 'OWNER' and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{id}/archive(id=${workspace.id})}" class="team-archive-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><span>Archiving keeps workspace records and makes them read-only.</span><button class="button button-danger" type="submit">Archive workspace</button>
+        </form>
+        <form th:if="${currentMembership.role.name() == 'OWNER' and workspace.status.name() == 'ARCHIVED'}" method="post" th:action="@{/workspaces/{id}/restore(id=${workspace.id})}" class="team-archive-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><span>Restore this workspace to resume collaboration.</span><button class="button button-primary" type="submit">Restore workspace</button>
+        </form>
+    </section>
+</main></body></html>

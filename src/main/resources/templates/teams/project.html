@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Shared project — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspace.id})}">← <span th:text="${workspace.name}">Workspace</span></a>
+    <header class="project-heading"><div><p class="eyebrow">SHARED PROJECT</p><h1 th:text="${project.name}">Project</h1><p th:text="${#strings.isEmpty(project.description) ? 'Shared project details.' : project.description}">Description</p></div><div class="team-heading-actions"><a class="button button-quiet" th:href="@{/projects/{id}/agile(id=${project.id})}">Scrum</a><a class="button button-quiet" th:href="@{/projects/{id}/gantt(id=${project.id})}">Gantt &amp; dependencies</a></div></header>
+    <div class="team-project-notice"><strong>Shared project view</strong><span>Only this project and its linked tasks are shown. Personal time, goals, habits, and private activity stay in the owner's personal space.</span></div>
+    <form class="team-create-task team-project-create" th:if="${canEdit and !todoColumns.empty}" method="post" th:action="@{/workspaces/{workspaceId}/projects/{projectId}/tasks(workspaceId=${workspace.id},projectId=${project.id})}">
+        <label class="sr-only" for="shared-project-task-title">Task title</label><input id="shared-project-task-title" name="title" maxlength="160" required placeholder="Add a task to this project">
+        <label class="sr-only" for="shared-project-task-column">Starting column</label><select id="shared-project-task-column" name="columnId"><option th:each="column : ${todoColumns}" th:value="${column.id}" th:text="${column.name}">To Do</option></select>
+        <label class="sr-only" for="shared-project-task-priority">Priority</label><select id="shared-project-task-priority" name="priority"><option value="MEDIUM">Medium priority</option><option value="HIGH">High priority</option><option value="URGENT">Urgent</option><option value="LOW">Low priority</option></select>
+        <button class="button button-primary" type="submit">Add task</button>
+    </form>
+    <p class="team-project-notice" th:if="${canEdit and todoColumns.empty}">This project's workflow has no To Do column, so new shared tasks cannot be added from here.</p>
+    <section class="team-project-board" aria-label="Shared project Kanban board">
+        <section class="team-project-board-column" th:each="columnView : ${board}">
+            <header><h2 th:text="${columnView.column.name}">To Do</h2><span class="team-role" th:text="${columnView.cards.size()}">0</span></header>
+            <p class="team-board-wip" th:if="${columnView.column.wipLimit != null}" th:text="${columnView.wipCount + ' / ' + columnView.column.wipLimit + ' in progress'}">0 / 3</p>
+            <article class="team-project-card" th:each="placement : ${columnView.cards}">
+                <a class="team-project-card-title" th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${workspace.id},taskId=${placement.task.id})}" th:text="${placement.task.title}">Task title</a>
+                <p><span th:text="${#strings.replace(placement.task.status.name(), '_', ' ')}">TODO</span><span th:if="${placement.task.dueDate != null}" th:text="${' · due ' + #temporals.format(placement.task.dueDate, 'MMM d, yyyy')}">· due date</span></p>
+                <span class="team-role" th:text="${placement.task.priority}">MEDIUM</span>
+                <form class="team-card-move" th:if="${canEdit and project.archivedAt == null}" method="post" th:action="@{/workspaces/{workspaceId}/projects/{projectId}/tasks/{taskId}/move(workspaceId=${workspace.id},projectId=${project.id},taskId=${placement.task.id})}">
+                    <input type="hidden" name="position" value="9999">
+                    <label class="sr-only" th:for="${'move-' + placement.task.id}">Move task to column</label><select th:id="${'move-' + placement.task.id}" name="columnId"><option th:each="destination : ${board}" th:value="${destination.column.id}" th:selected="${destination.column.id == columnView.column.id}" th:text="${destination.column.name}">To Do</option></select>
+                    <button class="button button-quiet" type="submit">Move</button>
+                </form>
+            </article>
+            <p class="team-board-empty" th:if="${columnView.cards.empty}">No tasks</p>
+        </section>
+    </section>
+</main></body></html>

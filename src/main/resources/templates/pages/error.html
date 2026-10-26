@@ -1,0 +1,4 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/public :: layout(~{::title}, ~{::main}, 'inner-page error-page')}">
+<head><title th:text="${status} + ' — TASK OS'">An error occurred — TASK OS</title></head>
+<body><main id="main-content" class="error-content"><div class="error-symbol" aria-hidden="true"><span th:text="${status}">500</span></div><p class="eyebrow eyebrow-muted">SOMETHING INTERRUPTED THE JOURNEY</p><h1 th:text="${title}">We hit a snag</h1><p class="error-description" th:text="${message}">Please try again.</p><p class="error-reference" th:if="${reference != null}">Reference <code th:text="${reference}">reference</code></p><div class="hero-actions"><a class="button button-primary" th:href="@{/}">Back to home <span aria-hidden="true">→</span></a><a class="button button-quiet" th:href="@{/app}">Open workspace</a></div></main></body></html>

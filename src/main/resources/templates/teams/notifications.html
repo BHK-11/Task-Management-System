@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Notifications — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <header class="project-heading"><div><p class="eyebrow">TEAM INBOX</p><h1>Notifications</h1><p>Assignments, direct mentions, and opted-in activity from workspaces where you are an active member.</p></div></header>
+    <section class="team-notifications-page" th:if="${!notifications.empty}" aria-label="Team notifications">
+        <article class="team-notification-card" th:each="item : ${notifications}" th:classappend="${item.readAt == null ? ' unread' : ''}">
+            <span class="notification-dot" aria-hidden="true"></span><div class="team-notification-copy"><strong th:text="${item.title}">Notification</strong><small><span th:text="${item.type}">ASSIGNMENT</span><span th:text="${' · ' + #temporals.format(item.deliveredAt, 'MMM d, yyyy · HH:mm')}">· time</span></small></div>
+            <a class="button button-quiet button-small" th:if="${item.taskId != null}" th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${item.workspaceId},taskId=${item.taskId})}">Open work</a>
+            <a class="button button-quiet button-small" th:if="${item.taskId == null}" th:href="@{/workspaces/{id}(id=${item.workspaceId})}">Open workspace</a>
+            <form th:if="${item.readAt == null}" method="post" th:action="@{/notifications/{id}/read(id=${item.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="team-text-button" type="submit">Mark read</button></form>
+            <span class="team-read-state" th:if="${item.readAt != null}">Read</span>
+        </article>
+    </section>
+    <section class="team-empty project-panel" th:if="${notifications.empty}"><span class="team-empty-mark" aria-hidden="true">◉</span><h2>Nothing new</h2><p>Team assignments and mentions will appear here. Personal reminders remain in your existing notification center.</p><a class="button button-quiet" th:href="@{/teams}">Open team workspaces</a></section>
+</main></body></html>

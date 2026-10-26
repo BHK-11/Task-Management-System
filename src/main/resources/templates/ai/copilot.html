@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>AI Copilot — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content copilot-page">
+    <div class="task-flash" role="status" th:if="${copilotMessage}" th:text="${copilotMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${copilotError}" th:text="${copilotError}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${formError}" th:text="${formError}"></div>
+
+    <header class="copilot-heading">
+        <div><p class="eyebrow">PLAN TOGETHER · ACT WITH APPROVAL</p><h1>AI Copilot</h1>
+            <p>Describe the outcome. Review a structured plan. TASK OS creates personal tasks only after you approve.</p>
+        </div>
+        <div class="copilot-heading-actions"><a class="button button-quiet" th:href="@{/settings/ai}">Model settings</a><span class="copilot-status" th:classappend="${aiConfigured ? ' is-ready' : ''}"><i aria-hidden="true"></i><span th:text="${aiConfigured ? 'Planner settings present' : 'Setup required'}">Setup required</span></span></div>
+    </header>
+
+    <div class="copilot-layout">
+        <section class="copilot-main-column">
+            <section class="copilot-panel copilot-composer" aria-labelledby="copilot-compose-title">
+                <div class="copilot-panel-heading"><div><p class="eyebrow eyebrow-muted">YOUR INSTRUCTION</p><h2 id="copilot-compose-title">What should we plan?</h2></div><span class="copilot-spark" aria-hidden="true">✦</span></div>
+                <form th:action="@{/ai/plans}" th:object="${planForm}" method="post">
+                    <label class="sr-only" for="copilot-instruction">Describe what you want to plan</label>
+                    <textarea id="copilot-instruction" th:field="*{instruction}" maxlength="20000" rows="5" placeholder="For example: Make revision tasks, create a study guide DOCX, build an XLSX tracker, prepare a short PPTX, and draft an email for me to review."></textarea>
+                    <div class="copilot-voice-controls"><label for="copilot-voice-language">Voice language</label><select id="copilot-voice-language"><option value="en-IN">English / Hinglish</option><option value="hi-IN">Hindi</option></select><button id="copilot-voice-start" class="button button-quiet" type="button">Start voice input</button><button id="copilot-voice-stop" class="button button-quiet" type="button" disabled>Stop</button><span id="copilot-voice-status" role="status" aria-live="polite">Text input is always available.</span></div>
+                    <p class="copilot-privacy" th:if="${assistTaskTitle != null}" th:text="${'AI Assist for “' + assistTaskTitle + '”. The selected task title and description are prefilled. Review or remove them; nothing is sent until you create a plan.'}">AI Assist for this task.</p>
+                    <div class="copilot-compose-bottom"><p>Up to 20,000 characters and 12 jobs. Review every task and deliverable before approving.</p><button class="button button-primary" type="submit" th:disabled="${!aiConfigured}">Create a plan <span aria-hidden="true">→</span></button></div>
+                </form>
+                <div class="copilot-setup" th:if="${!aiConfigured}" role="note">
+                    <strong>Connect the private planner to enable requests.</strong>
+                    <span>Configure <code>TASKOS_AI_SERVICE_URL</code> and the same 32+ character <code>TASKOS_AI_SERVICE_TOKEN</code> in TASK OS and the AI service. Add a provider key and model only to the private AI service environment.</span>
+                </div>
+                <p class="copilot-privacy">When configured, your instruction and timezone are sent to the provider selected by your AI model settings. Task details are included only if you open AI Assist from a task and keep that text in the request. The original instruction and plan are stored in your TASK OS account history.</p>
+            </section>
+
+            <section class="copilot-panel copilot-plan" th:if="${selectedPlan != null}" th:attr="data-plan-status=${selectedPlan.status.name()}" aria-labelledby="plan-title">
+                <div class="copilot-panel-heading"><div><p class="eyebrow eyebrow-muted">PLAN REVIEW</p><h2 id="plan-title" th:text="${selectedPlan.summary}">Your proposed plan</h2></div><span class="copilot-plan-state" th:text="${#strings.replace(selectedPlan.status.name(), '_', ' ')}">PENDING APPROVAL</span></div>
+                <blockquote class="copilot-request"><span>Your request</span><p th:text="${selectedPlan.originalRequest}">Original request</p></blockquote>
+                <p class="copilot-plan-meta"><span th:text="${selectedPlan.detectedLanguage}">en</span><span th:text="${selectedPlan.providerModel}">model</span><span th:if="${selectedPlan.inputTokens != null and selectedPlan.outputTokens != null}" th:text="${selectedPlan.inputTokens + selectedPlan.outputTokens} + ' tokens used'">0 tokens used</span></p>
+
+                <div class="copilot-clarifications" th:if="${!#strings.isEmpty(selectedPlan.clarifications)}" role="status"><strong>Clarification needed before approval</strong><p th:text="${selectedPlan.clarifications}">Question</p><small>Update the instruction above and create a revised plan before approving.</small></div>
+
+                <form th:if="${selectedPlan.status.name() == 'PENDING_APPROVAL' and !#lists.isEmpty(selectedPlan.steps.?[actionType.name() != 'UNSUPPORTED'])}" th:action="@{/ai/plans/{id}/edit-work(id=${selectedPlan.id})}" method="post" class="copilot-edit-form">
+                    <h3>Review every task and deliverable</h3>
+                    <div class="copilot-step-list">
+                        <article class="copilot-step" th:each="step : ${selectedPlan.steps}" th:if="${step.actionType.name() != 'UNSUPPORTED'}">
+                            <div class="copilot-step-top"><span class="copilot-step-number" th:text="${step.stepIndex + 1}">1</span><span class="copilot-risk" th:text="${#strings.replace(step.actionType.name(), '_', ' ')}">Needs your approval</span></div>
+                            <input type="hidden" name="stepIds" th:value="${step.id}">
+                            <label>Title<input type="text" name="titles" maxlength="160" required th:value="${step.title}"></label>
+                            <label>Description<textarea name="descriptions" maxlength="6000" rows="2" th:text="${step.description}"></textarea></label>
+                            <div class="copilot-step-fields" th:if="${step.actionType.name() == 'CREATE_TASK'}"><label>Priority<select name="priorities"><option th:each="priority : ${T(com.taskos.task.entity.TaskPriority).values()}" th:value="${priority.name()}" th:selected="${priority == step.priority}" th:text="${#strings.toLowerCase(priority.name())}">medium</option></select></label><label>Due date<input type="date" name="dueDates" th:value="${step.dueDate}"></label></div>
+                            <th:block th:unless="${step.actionType.name() == 'CREATE_TASK'}"><input type="hidden" name="priorities" value="MEDIUM"><input type="hidden" name="dueDates" value=""></th:block>
+                            <label th:unless="${step.actionType.name() == 'CREATE_TASK'}">Editable deliverable content<textarea name="contents" maxlength="12000" rows="5" required th:text="${step.content}"></textarea></label>
+                            <textarea th:if="${step.actionType.name() == 'CREATE_TASK'}" class="sr-only" aria-label="Empty task content" name="contents" maxlength="12000"></textarea>
+                            <p class="copilot-dependency" th:if="${!#lists.isEmpty(step.dependencies)}" th:text="${'Depends on step(s): ' + step.dependenciesLabel}">Depends on</p>
+                        </article>
+                    </div>
+                    <button class="button button-quiet" type="submit">Save review changes</button>
+                </form>
+
+                <div class="copilot-unsupported" th:if="${!#lists.isEmpty(selectedPlan.steps.?[actionType.name() == 'UNSUPPORTED'])}">
+                    <h3>Not available in this copilot yet</h3>
+                    <ul><li th:each="step : ${selectedPlan.steps}" th:if="${step.actionType.name() == 'UNSUPPORTED'}"><strong th:text="${step.title}">Unsupported action</strong><span th:text="${step.description}">Explanation</span></li></ul>
+                </div>
+                <p class="copilot-empty-plan" th:if="${#lists.isEmpty(selectedPlan.steps)}">No executable steps were returned. Refine the instruction above.</p>
+
+                <div class="copilot-results" th:if="${selectedPlan.status.name() != 'PENDING_APPROVAL' and selectedPlan.status.name() != 'REJECTED'}" aria-label="Actual plan results">
+                    <h3>What happened</h3>
+                    <ul><li th:each="step : ${selectedPlan.steps}"><span class="copilot-result-state" th:text="${#strings.replace(step.status.name(), '_', ' ')}">PENDING</span><a th:if="${step.resultTaskId != null}" th:href="@{/tasks/{id}(id=${step.resultTaskId})}" th:text="${step.title}">Created task</a><a th:if="${step.resultArtifactId != null}" th:href="@{/ai/artifacts/{id}(id=${step.resultArtifactId})}" th:text="${'Download ' + step.title}">Download verified deliverable</a><span th:if="${step.resultTaskId == null and step.resultArtifactId == null}" th:text="${step.title}">Work item</span><small th:text="${step.resultSummary}">Result</small></li></ul>
+                </div>
+                <p class="copilot-rejected" th:if="${selectedPlan.status.name() == 'REJECTED'}">You rejected this plan. No jobs were executed.</p>
+
+                <div class="copilot-approval-actions" th:if="${selectedPlan.status.name() == 'PENDING_APPROVAL'}">
+                    <form th:action="@{/ai/plans/{id}/approve(id=${selectedPlan.id})}" method="post"><button class="button button-primary" type="submit" th:disabled="${!#strings.isEmpty(selectedPlan.clarifications) or #lists.isEmpty(selectedPlan.steps.?[actionType.name() != 'UNSUPPORTED'])}">Approve and start work</button></form>
+                    <form th:action="@{/ai/plans/{id}/reject(id=${selectedPlan.id})}" method="post"><button class="button button-quiet" type="submit">Reject plan</button></form>
+                </div>
+                <p class="copilot-footnote">Approval is checked again on the server. Tasks use the existing owner-scoped TaskService. Deliverables are generated by the private service, saved outside public web folders, and downloaded only by their owner. Email and message jobs create drafts; they do not send anything.</p>
+            </section>
+        </section>
+
+        <aside class="copilot-history-column">
+            <section class="copilot-panel" aria-labelledby="history-title"><div class="copilot-panel-heading"><div><p class="eyebrow eyebrow-muted">YOUR WORK</p><h2 id="history-title">Recent plans</h2></div></div>
+                <ul class="copilot-history-list"><li th:each="plan : ${aiPlans}"><a th:href="@{/ai(planId=${plan.id})}" th:classappend="${selectedPlan != null and selectedPlan.id == plan.id ? ' is-current' : ''}"><span class="copilot-history-state" th:text="${#strings.replace(plan.status.name(), '_', ' ')}">Pending</span><strong th:text="${plan.summary}">Plan summary</strong><small th:text="${#temporals.format(plan.createdAt, 'MMM d, yyyy · HH:mm')}">Date</small></a></li><li class="copilot-history-empty" th:if="${#lists.isEmpty(aiPlans)}">Your saved plans will appear here.</li></ul>
+            </section>
+            <section class="copilot-panel copilot-capability-panel" aria-labelledby="capabilities-title"><p class="eyebrow eyebrow-muted">CURRENT CAPABILITIES</p><h2 id="capabilities-title">Work in one approved plan</h2><ul><li><span aria-hidden="true">✓</span><span>English, Hindi, and Hinglish text plans up to 20,000 characters</span></li><li><span aria-hidden="true">✓</span><span>Optional live browser speech recognition with an editable transcript</span></li><li><span aria-hidden="true">✓</span><span>Personal tasks and verified DOCX, PDF, XLSX, PPTX, and text drafts</span></li><li><span aria-hidden="true">✓</span><span>Dependencies, queued progress, private downloads, and approval</span></li><li><span aria-hidden="true">·</span><span>Gmail and WhatsApp sending and external agents are not connected</span></li></ul><p class="copilot-privacy">Speech recognition runs in your browser and may use its configured speech service. TASK OS stores the editable transcript only after you submit it; microphone audio is not uploaded to the TASK OS app.</p></section>
+        </aside>
+    </div>
+</main><script th:src="@{/js/ai-copilot.js}" defer></script></body></html>

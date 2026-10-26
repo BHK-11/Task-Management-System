@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/public :: layout(~{::title}, ~{::main}, 'home-page')}">
+<head><title>TASK OS — Make room for meaningful work</title></head>
+<body>
+<main id="main-content" class="cinematic-home">
+    <section class="cinema-hero" aria-labelledby="hero-title">
+        <div class="hero-grid-glow" aria-hidden="true"></div>
+        <div class="cinema-shell hero-layout">
+            <div class="hero-copy" data-story-reveal>
+                <p class="cinema-kicker"><span class="signal-dot" aria-hidden="true"></span> A connected workspace for what matters</p>
+                <h1 id="hero-title">Make space for<br><span>meaningful work.</span></h1>
+                <p class="hero-description">Bring tasks, projects, focus time, goals, and team workflows into one calm place—with a clear next step whenever you need one.</p>
+                <div class="hero-actions">
+                    <a class="cinema-button cinema-button-primary" th:href="@{/signup}">Create your workspace <span aria-hidden="true">↗</span></a>
+                    <a class="cinema-button cinema-button-quiet" th:href="@{/preview}">Explore the live preview</a>
+                </div>
+                <div class="hero-proof"><span class="proof-line" aria-hidden="true"></span><span>Tasks · Projects · Time · Teams · Automation</span></div>
+                <a class="scroll-cue" href="#voice-demo"><span class="scroll-cue-mark" aria-hidden="true"></span> See how it comes together</a>
+            </div>
+            <div class="orb-stage" data-story-reveal data-parallax>
+                <div class="orb-lens" role="img" aria-label="A layered electric-blue and violet orb representing a connected workspace">
+                    <div class="orb-halo"></div>
+                    <div class="orb-ring orb-ring-one"></div>
+                    <div class="orb-ring orb-ring-two"></div>
+                    <div class="orb-ring orb-ring-three"></div>
+                    <div class="orb-core"><span class="orb-highlight"></span><span class="orb-glint"></span></div>
+                    <span class="orb-satellite satellite-one"></span><span class="orb-satellite satellite-two"></span>
+                </div>
+                <div class="orbit-note orbit-note-top"><span class="note-spark" aria-hidden="true">01</span><span><strong>One clear next step</strong><small>Keep the important work in view</small></span></div>
+                <div class="orbit-note orbit-note-bottom"><span class="note-spark note-spark-cyan" aria-hidden="true">02</span><span><strong>Room to focus</strong><small>Plan time around your priorities</small></span></div>
+                <div class="hero-work-card">
+                    <div class="work-card-head"><span>ILLUSTRATIVE WORKSPACE</span><span class="work-card-date">TODAY</span></div>
+                    <div class="work-card-title"><span class="work-card-check" aria-hidden="true">✓</span><span><strong>Outline the launch plan</strong><small>Project · Next step</small></span></div>
+                    <div class="work-card-meta"><span class="work-card-progress"><i></i></span><span>Focus block · 10:30</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-bottom-rule" aria-hidden="true"></div>
+    </section>
+
+    <section class="story-section voice-section" id="voice-demo" aria-labelledby="voice-title">
+        <div class="story-shell story-two-column">
+            <div class="story-copy" data-story-reveal>
+                <p class="section-index"><span>01</span> CAPTURE A THOUGHT</p>
+                <h2 id="voice-title">The next step can start as a sentence.</h2>
+                <p>Try a browser-based voice draft, then decide what to do with it. This demo never creates a task or sends a transcript to TASK OS.</p>
+                <p class="privacy-note">Your browser may use its own speech service to transcribe audio. Microphone access starts only when you press the button.</p>
+            </div>
+            <div class="voice-card" data-story-reveal>
+                <div class="voice-card-head"><span class="voice-status-mark" aria-hidden="true"></span><span>VOICE DRAFT</span><span class="voice-demo-label">BROWSER DEMO</span></div>
+                <div class="waveform" data-waveform aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                <p class="voice-status" data-voice-status role="status" aria-live="polite">Ready when you are. Press start to speak a short draft.</p>
+                <p class="voice-transcript" data-voice-transcript aria-live="polite">Example: “Reserve 30 minutes to outline the project launch plan.”</p>
+                <button class="voice-button" type="button" data-voice-start aria-pressed="false" aria-describedby="voice-privacy">Start voice demo</button>
+                <p class="voice-privacy" id="voice-privacy">Nothing is saved by this demo. Availability depends on your browser.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section plan-section" aria-labelledby="plan-title">
+        <div class="story-shell story-two-column plan-layout">
+            <div class="story-copy" data-story-reveal>
+                <p class="section-index"><span>02</span> SHAPE THE WORK</p>
+                <h2 id="plan-title">Turn a fuzzy goal into a plan you can move.</h2>
+                <p>Start with the outcome, break the work into manageable steps, then choose where each piece belongs.</p>
+                <div class="plan-steps" role="group" aria-label="Example planning steps">
+                    <button type="button" class="plan-step is-active" data-plan-step aria-pressed="true" data-title="Name the outcome" data-copy="Write down what success looks like before adding more work."><span>01</span> Clarify</button>
+                    <button type="button" class="plan-step" data-plan-step aria-pressed="false" data-title="Choose the next action" data-copy="Turn the outcome into a small, specific task you can start."><span>02</span> Break it down</button>
+                    <button type="button" class="plan-step" data-plan-step aria-pressed="false" data-title="Make room for focus" data-copy="Protect time for the work instead of hoping a gap appears."><span>03</span> Schedule</button>
+                    <button type="button" class="plan-step" data-plan-step aria-pressed="false" data-title="Keep the team aligned" data-copy="Share the owner, decision, and next step with the people involved."><span>04</span> Share</button>
+                </div>
+                <p class="sample-note">Example flow · selecting a step does not create or change workspace data.</p>
+            </div>
+            <div class="plan-preview" data-plan-preview data-story-reveal aria-live="polite" aria-atomic="true">
+                <div class="preview-window-bar"><span></span><span></span><span></span><small>WORKING PLAN / EXAMPLE</small></div>
+                <div class="preview-window-content">
+                    <p class="preview-label" data-plan-label>01 / CLARIFY</p>
+                    <h3 data-plan-title>Name the outcome</h3>
+                    <p data-plan-copy>Write down what success looks like before adding more work.</p>
+                    <div class="preview-divider"></div>
+                    <div class="preview-task"><span class="preview-task-check" aria-hidden="true"></span><span>Agree on a useful launch outcome</span><small>5 min</small></div>
+                    <div class="preview-task preview-task-muted"><span class="preview-task-check" aria-hidden="true"></span><span>List the first action</span><small>10 min</small></div>
+                </div>
+                <span class="preview-caption">Illustrative plan · not a live task list</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section capabilities-section" id="capabilities" aria-labelledby="capabilities-title">
+        <div class="story-shell">
+            <div class="section-heading" data-story-reveal>
+                <div><p class="section-index"><span>03</span> ONE CONNECTED WORKSPACE</p><h2 id="capabilities-title">The tools you need, close to the work.</h2></div>
+                <p>Start simply. Add more structure when your work calls for it.</p>
+            </div>
+            <div class="capability-grid">
+                <a class="capability-card" th:href="@{/tasks}" data-story-reveal><span class="capability-number">01</span><span class="capability-mark mark-blue" aria-hidden="true">T</span><h3>Tasks</h3><p>Keep the next action clear and the details close by.</p><span class="capability-link">Open tasks <span aria-hidden="true">↗</span></span></a>
+                <a class="capability-card" th:href="@{/projects}" data-story-reveal><span class="capability-number">02</span><span class="capability-mark mark-violet" aria-hidden="true">P</span><h3>Projects &amp; sprints</h3><p>Bring plans, milestones, and team delivery together.</p><span class="capability-link">Explore projects <span aria-hidden="true">↗</span></span></a>
+                <a class="capability-card" th:href="@{/calendar}" data-story-reveal><span class="capability-number">03</span><span class="capability-mark mark-cyan" aria-hidden="true">F</span><h3>Time &amp; focus</h3><p>Make a realistic plan for your calendar and attention.</p><span class="capability-link">Plan your time <span aria-hidden="true">↗</span></span></a>
+                <a class="capability-card" th:href="@{/teams}" data-story-reveal><span class="capability-number">04</span><span class="capability-mark mark-green" aria-hidden="true">W</span><h3>Team workspaces</h3><p>See shared work, assignments, and project activity.</p><span class="capability-link">View team spaces <span aria-hidden="true">↗</span></span></a>
+                <a class="capability-card" th:href="@{/goals}" data-story-reveal><span class="capability-number">05</span><span class="capability-mark mark-violet" aria-hidden="true">G</span><h3>Goals &amp; reviews</h3><p>Connect daily effort to outcomes worth revisiting.</p><span class="capability-link">Explore outcomes <span aria-hidden="true">↗</span></span></a>
+                <a class="capability-card" th:href="@{/automations}" data-story-reveal><span class="capability-number">06</span><span class="capability-mark mark-blue" aria-hidden="true">A</span><h3>Automations</h3><p>Apply safe, traceable rules to workspace events.</p><span class="capability-link">See automations <span aria-hidden="true">↗</span></span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section automation-section" id="automations" aria-labelledby="automation-title">
+        <div class="story-shell story-two-column automation-layout">
+            <div class="story-copy" data-story-reveal>
+                <p class="section-index"><span>04</span> AUTOMATE THE ROUTINE</p>
+                <h2 id="automation-title">Let a clear rule handle the repeatable step.</h2>
+                <p>Workspace automations connect task events to scoped actions and keep a versioned execution history for review.</p>
+                <a class="text-action" th:href="@{/automations}">Open Automation Center <span aria-hidden="true">↗</span></a>
+            </div>
+            <div class="rule-card" data-story-reveal>
+                <div class="rule-card-head"><span>RULE EXAMPLE</span><span class="rule-example-badge">PREVIEW</span></div>
+                <div class="rule-step"><span class="rule-step-icon">01</span><div><small>WHEN</small><strong>A workspace task changes</strong></div></div>
+                <div class="rule-connector" aria-hidden="true"></div>
+                <div class="rule-step"><span class="rule-step-icon rule-step-violet">02</span><div><small>CHECK</small><strong>It matches the rule conditions</strong></div></div>
+                <div class="rule-connector" aria-hidden="true"></div>
+                <div class="rule-step"><span class="rule-step-icon rule-step-cyan">03</span><div><small>THEN</small><strong>Assign it to the triggering teammate</strong></div></div>
+                <p class="rule-footnote">Illustrative workflow · no rule is running from this page.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section outcomes-section" aria-labelledby="outcomes-title">
+        <div class="story-shell story-two-column outcomes-layout">
+            <div class="story-copy" data-story-reveal>
+                <p class="section-index"><span>05</span> KEEP THE OUTPUT USEFUL</p>
+                <h2 id="outcomes-title">Plans that stay connected to what you do.</h2>
+                <p>Move from a task to a project, protect time to do the work, and return to the result in a review.</p>
+            </div>
+            <div class="outcome-stack" data-story-reveal>
+                <a class="outcome-row" th:href="@{/tasks}"><span class="outcome-symbol">T</span><span><strong>Next actions</strong><small>Tasks, priorities, and checklists</small></span><span aria-hidden="true">↗</span></a>
+                <a class="outcome-row" th:href="@{/projects}"><span class="outcome-symbol outcome-violet">P</span><span><strong>Project plans</strong><small>Milestones, schedules, and sprints</small></span><span aria-hidden="true">↗</span></a>
+                <a class="outcome-row" th:href="@{/calendar}"><span class="outcome-symbol outcome-cyan">F</span><span><strong>Time to do the work</strong><small>Calendar, focus sessions, and time blocks</small></span><span aria-hidden="true">↗</span></a>
+                <a class="outcome-row" th:href="@{/reviews/weekly}"><span class="outcome-symbol outcome-green">R</span><span><strong>Useful reflections</strong><small>Reviews grounded in your workspace activity</small></span><span aria-hidden="true">↗</span></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="story-section workspace-reveal" aria-labelledby="workspace-title">
+        <div class="story-shell workspace-reveal-layout">
+            <div class="story-copy" data-story-reveal>
+                <p class="section-index"><span>06</span> YOUR WORK, IN VIEW</p>
+                <h2 id="workspace-title">A calmer dashboard for the whole day.</h2>
+                <p>The public preview lets you explore the workspace before creating an account. The example below is illustrative; open the preview for the working interface.</p>
+                <a class="text-action" th:href="@{/preview}">Explore the interactive preview <span aria-hidden="true">↗</span></a>
+            </div>
+            <a class="dashboard-mock" th:href="@{/preview}" aria-label="Open the interactive TASK OS workspace preview" data-story-reveal>
+                <div class="mock-topbar"><span class="mock-brand-mark" aria-hidden="true">T</span><strong>TASK OS</strong><span class="mock-topbar-spacer"></span><span class="mock-date">MY DAY · EXAMPLE</span><span class="mock-avatar" aria-hidden="true">A</span></div>
+                <div class="mock-layout">
+                    <div class="mock-sidebar"><span class="mock-nav-active">My Day</span><span>Tasks</span><span>Projects</span><span>Calendar</span><span>Focus</span></div>
+                    <div class="mock-main"><p class="mock-overline">TUESDAY · A SAMPLE DAY</p><h3>A little more room to think.</h3><p class="mock-subtitle">A clear plan, at a glance.</p>
+                        <div class="mock-task"><span class="mock-checkbox" aria-hidden="true"></span><span><strong>Outline the launch plan</strong><small>Project planning · 25 min</small></span><span class="mock-task-tag">FOCUS</span></div>
+                        <div class="mock-task"><span class="mock-checkbox" aria-hidden="true"></span><span><strong>Review the sprint notes</strong><small>Team workspace · 15 min</small></span><span class="mock-task-tag mock-tag-violet">TEAM</span></div>
+                        <div class="mock-task mock-task-done"><span class="mock-checkbox" aria-hidden="true">✓</span><span><strong>Choose today's priority</strong><small>Daily planning · Complete</small></span><span class="mock-task-tag mock-tag-green">DONE</span></div>
+                    </div>
+                </div>
+                <span class="mock-caption">Illustrative screen · example content</span>
+            </a>
+        </div>
+    </section>
+
+    <section class="closing-stage" aria-labelledby="closing-title">
+        <div class="closing-glow" aria-hidden="true"></div>
+        <div class="closing-content" data-story-reveal>
+            <p class="cinema-kicker"><span class="signal-dot" aria-hidden="true"></span> YOUR NEXT STEP STARTS HERE</p>
+            <h2 id="closing-title">Make room for<br><span>what matters next.</span></h2>
+            <p>Start with one task. Build a workspace around the way you work.</p>
+            <div class="hero-actions closing-actions"><a class="cinema-button cinema-button-primary" th:href="@{/signup}">Create your workspace <span aria-hidden="true">↗</span></a><a class="cinema-button cinema-button-quiet" th:href="@{/preview}">Explore the preview</a></div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

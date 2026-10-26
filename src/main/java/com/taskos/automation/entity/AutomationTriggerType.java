@@ -1,0 +1,6 @@
+package com.taskos.automation.entity;
+
+public enum AutomationTriggerType {
+    TASK_CREATED, TASK_STATUS_CHANGED, TASK_COMPLETED, TASK_REOPENED,
+    TASK_PRIORITY_CHANGED, TASK_DUE_DATE_CHANGED, TASK_TAG_ADDED, TASK_ASSIGNED, SCHEDULED
+}

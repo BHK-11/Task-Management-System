@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Workspace foundation — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content">
+    <section class="workspace-welcome">
+        <div><p class="eyebrow eyebrow-muted">YOUR SPACE TO BEGIN</p><h1>Welcome to TASK OS<span th:if="${currentUser != null}" th:text="${', ' + currentUser.displayName}">.</span></h1><p>Plan and track your work with persistent tasks, subtasks, checklists, and tags.</p></div>
+        <span class="phase-pill"><span class="phase-pill-dot"></span> Phase 2 · Tasks</span>
+    </section>
+    <section class="foundation-banner"><div class="banner-symbol" aria-hidden="true"><span>✓</span></div><div><p class="banner-overline">READY WHEN YOU ARE</p><h2>Turn your next step into a task.</h2><p>Create tasks with clear priorities and due dates, then keep the details together with checklists and tags.</p></div><a th:href="@{/tasks}" class="text-link" th:if="${currentUser != null}">Open tasks <span aria-hidden="true">→</span></a><a th:href="@{/login}" class="text-link" th:if="${currentUser == null}">Sign in <span aria-hidden="true">→</span></a></section>
+    <section class="workspace-section" aria-labelledby="ready-title"><div class="workspace-section-head"><div><p class="eyebrow eyebrow-muted">THE FOUNDATION</p><h2 id="ready-title">Ready for what comes next</h2></div><a th:href="@{/roadmap}" class="text-link">View roadmap <span aria-hidden="true">→</span></a></div>
+        <div class="foundation-grid"><article class="foundation-card" th:each="feature : ${foundationFeatures}"><div class="foundation-card-top"><span class="foundation-check" aria-hidden="true">✓</span><span class="availability-label">IN PLACE</span></div><h3 th:text="${feature.name}">Responsive workspace shell</h3><p th:text="${feature.description}">A real workspace frame.</p></article></div>
+    </section>
+    <section class="architecture-strip" aria-label="Application architecture"><div class="architecture-intro"><span class="architecture-icon" aria-hidden="true">◎</span><span><strong>One coherent application</strong><small>Built to be understandable and extendable</small></span></div><div class="architecture-flow"><span>Spring MVC</span><i aria-hidden="true">→</i><span>Thymeleaf</span><i aria-hidden="true">→</i><span>PostgreSQL</span></div></section>
+</main>
+</body>
+</html>

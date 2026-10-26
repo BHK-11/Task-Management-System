@@ -1,0 +1,35 @@
+.communication-page { display: grid; gap: 1.25rem; }
+.communication-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.25rem; margin: 8px 0 4px; }
+.communication-hero h1 { margin: 3px 0 8px; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.05em; }
+.communication-hero p:not(.eyebrow) { max-width: 690px; margin: 0; color: var(--muted); line-height: 1.65; }
+.communication-overall-state,.communication-count,.communication-status { display: inline-flex; align-items: center; gap: 7px; width: fit-content; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--surface-soft); font-size: .78rem; font-weight: 650; }
+.communication-overall-state { flex: 0 0 auto; }
+.communication-overall-state > span { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.communication-notice { display: flex; align-items: flex-start; gap: 13px; padding: 17px; border: 1px solid color-mix(in srgb, var(--primary) 24%, var(--line)); border-radius: 15px; background: color-mix(in srgb, var(--primary) 5%, var(--surface)); }
+.communication-notice-icon { display: grid; flex: 0 0 28px; width: 28px; height: 28px; place-items: center; border-radius: 50%; color: var(--primary); background: var(--primary-soft); font-weight: 750; }
+.communication-notice h2 { margin: 0 0 4px; font-size: 1rem; }
+.communication-notice p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+.communication-section { display: grid; gap: .85rem; }
+.communication-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.communication-section-heading .eyebrow { margin: 0 0 4px; font-size: 9px; }
+.communication-section-heading h2 { margin: 0; font-size: 1.2rem; letter-spacing: -.025em; }
+.communication-provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: .75rem; }
+.communication-provider-card,.communication-workflow-card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow-soft); }
+.communication-provider-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.communication-category { margin: 0 0 3px; color: var(--muted); font-size: .75rem; font-weight: 650; }
+.communication-provider-top h3 { margin: 0; font-size: 1rem; letter-spacing: -.015em; }
+.communication-status { flex: 0 0 auto; font-size: .68rem; }
+.communication-provider-note,.communication-capability-note,.communication-workflow-card > p:not(.eyebrow) { color: var(--muted); font-size: .86rem; line-height: 1.6; }
+.communication-provider-note { min-height: 2.8em; margin: 14px 0 9px; }
+.communication-capability-note { margin: 0; padding-top: 9px; border-top: 1px solid var(--line); font-size: .76rem; }
+.communication-workflows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.communication-workflow-card h2 { margin: 0 0 7px; font-size: 1.12rem; }
+.communication-workflow-card > p:not(.eyebrow) { margin: 0 0 15px; }
+.communication-workflow-card .button { min-height: 44px; }
+.communication-workflow-muted { background: var(--surface-soft); box-shadow: none; }
+@media (max-width: 680px) {
+  .communication-hero { align-items: flex-start; flex-direction: column; }
+  .communication-section-heading { align-items: flex-start; }
+  .communication-workflows { grid-template-columns: 1fr; }
+  .communication-provider-note { min-height: auto; }
+}

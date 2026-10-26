@@ -1,0 +1,5 @@
+# Browser security boundary
+
+The worker requires a service token of at least 32 characters, exact operator-configured HTTPS origins, public DNS addresses, one origin per request, GET-only page requests, disabled service workers, disabled downloads, blocked WebSockets, at most 75 routed requests, 15-second navigation, and one concurrent run. Each request gets a fresh browser context; cookies and local storage are never imported or persisted. Java never exposes the worker token to the browser.
+
+These checks are defense in depth, not a network sandbox. DNS resolution can change between validation and Chromium connection, page loads can cause side effects through GET requests, and the current process shares the host OS account. Production use requires a non-root container/VM and network-level egress enforcement that blocks loopback, private networks, and metadata services. No private page content or screenshots are persisted; history keeps origin, title, result status, safe error code, and timestamp.

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Communications — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content communication-page">
+    <header class="communication-hero">
+        <div>
+            <p class="eyebrow eyebrow-muted">PHASE 19 · COMMUNICATIONS</p>
+            <h1>Communications</h1>
+            <p>Review connected communication tools and prepare work in one place. External accounts stay private and disconnected until their authorization is verified.</p>
+        </div>
+        <span class="communication-overall-state"><span aria-hidden="true"></span>No accounts connected</span>
+    </header>
+
+    <section class="communication-notice" aria-labelledby="connection-state-title">
+        <span class="communication-notice-icon" aria-hidden="true">i</span>
+        <div>
+            <h2 id="connection-state-title">No communication accounts are connected</h2>
+            <p>This page contains no sample inbox. TASK OS has not been authorized to read or send messages, access calendars, or retrieve meeting transcripts.</p>
+        </div>
+    </section>
+
+    <section class="communication-section" aria-labelledby="connectors-title">
+        <div class="communication-section-heading">
+            <div><p class="eyebrow eyebrow-muted">ACCOUNT STATUS</p><h2 id="connectors-title">Provider connections</h2></div>
+            <span class="communication-count" th:text="${#lists.size(connectors) + ' providers'}">0 providers</span>
+        </div>
+        <div class="communication-provider-grid">
+            <article class="communication-provider-card" th:each="connector : ${connectors}">
+                <div class="communication-provider-top">
+                    <div><p class="communication-category" th:text="${connector.category}">Email</p><h3 th:text="${connector.name}">Provider</h3></div>
+                    <span class="communication-status">NOT_CONNECTED</span>
+                </div>
+                <p class="communication-provider-note" th:text="${connector.requirement}">Provider setup is not configured.</p>
+                <p class="communication-capability-note">No provider capabilities are enabled.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="communication-workflows" aria-label="Available communication workflows">
+        <article class="communication-workflow-card">
+            <p class="eyebrow eyebrow-muted">AVAILABLE TODAY</p>
+            <h2>Prepare a message draft</h2>
+            <p>The AI Work Manager can create a downloadable email or message draft when its private planner is configured. Draft files are not sent or delivered.</p>
+            <a class="button button-primary" th:href="@{/ai}">Open AI Work Manager <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="communication-workflow-card communication-workflow-muted">
+            <p class="eyebrow eyebrow-muted">MEETING INTELLIGENCE</p>
+            <h2>Transcript import is not available</h2>
+            <p>Meeting connectors, transcript permissions, source-linked summaries, and approval-based task creation have not been implemented yet.</p>
+        </article>
+    </section>
+</main>
+</body>
+</html>

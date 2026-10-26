@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(pageTitle, pageContent)" th:attr="data-account-theme=${accountTheme}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fc">
+    <meta name="description" content="TASK OS workspace foundation preview.">
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/taskos-mark.svg}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'automations'}" th:href="@{/css/automations.css}">
+    <link rel="stylesheet" th:href="@{/css/tasks.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'analytics'}" th:href="@{/css/analytics.css}">
+    <link rel="stylesheet" th:href="@{/css/productivity.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'ai'}" th:href="@{/css/ai-copilot.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'browser'}" th:href="@{/css/browser.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'communications'}" th:href="@{/css/communications.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'memory' or activeNav == 'knowledge'}" th:href="@{/css/knowledge.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'agents'}" th:href="@{/css/agent-management.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'teams'}" th:href="@{/css/teams.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'goals' or activeNav == 'okrs' or activeNav == 'habits' or activeNav == 'reviews'}" th:href="@{/css/growth.css}">
+    <link rel="stylesheet" th:if="${scheduleView != null}" th:href="@{/css/gantt.css}">
+    <link rel="stylesheet" th:if="${activeNav == 'time' or activeNav == 'calendar' or activeNav == 'time-blocks' or activeNav == 'pomodoro' or activeNav == 'tracking' or activeNav == 'recurring' or activeNav == 'reminders' or activeNav == 'insights'}" th:href="@{/css/time.css}">
+    <script th:src="@{/js/app.js}"></script>
+    <script th:if="${activeNav == 'projects'}" th:src="@{/js/projects.js}" defer></script>
+    <script th:if="${activeNav == 'projects'}" th:src="@{/js/agile.js}" defer></script>
+    <script th:if="${scheduleView != null}" th:src="@{/vendor/motion.js}" defer></script>
+    <script th:if="${scheduleView != null}" th:src="@{/js/gantt.js}" defer></script>
+    <script th:if="${scheduleView != null}" th:src="@{/js/dependency-graph.js}" defer></script>
+    <script th:if="${activeNav == 'time' or activeNav == 'calendar' or activeNav == 'time-blocks' or activeNav == 'pomodoro' or activeNav == 'tracking' or activeNav == 'recurring' or activeNav == 'reminders' or activeNav == 'insights'}" th:src="@{/vendor/motion.js}" defer></script>
+    <script th:if="${activeNav == 'time' or activeNav == 'calendar' or activeNav == 'time-blocks' or activeNav == 'pomodoro' or activeNav == 'tracking' or activeNav == 'recurring' or activeNav == 'reminders' or activeNav == 'insights'}" th:src="@{/js/time.js}" defer></script>
+    <script th:if="${activeNav == 'calendar'}" th:src="@{/js/calendar.js}" defer></script>
+    <script th:if="${activeNav == 'pomodoro'}" th:src="@{/js/focus.js}" defer></script>
+    <title th:replace="${pageTitle}">TASK OS workspace</title>
+</head>
+<body class="workspace-page">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="workspace-frame">
+    <button class="sidebar-backdrop" type="button" aria-label="Close navigation" data-sidebar-backdrop hidden></button>
+    <aside class="workspace-sidebar" id="workspace-sidebar" aria-label="Workspace navigation">
+        <a class="brand brand-sidebar" th:href="@{/}" aria-label="TASK OS home">
+            <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 36 36"><path d="M18 2.8 32 10.9v14.2L18 33.2 4 25.1V10.9L18 2.8Z"/><path d="m11.1 18.2 4.4 4.3 9.7-10"/></svg></span>
+            <span class="brand-copy"><strong>TASK<span> OS</span></strong><small>Work, with intention</small></span>
+        </a>
+        <details class="workspace-switcher" th:if="${currentUser != null}">
+            <summary><span class="workspace-switcher-icon" aria-hidden="true" th:text="${workspace != null ? #strings.substring(workspace.name, 0, 1).toUpperCase() : (project != null and project.workspaceId != null ? #strings.substring(project.name, 0, 1).toUpperCase() : 'P')}">P</span><span><small>Switch workspace</small><strong th:text="${workspace != null ? workspace.name : (project != null and project.workspaceId != null ? project.name : 'Personal space')}">Personal space</strong></span><span aria-hidden="true">⌄</span></summary>
+            <nav class="workspace-switcher-menu" aria-label="Choose workspace"><a th:href="@{/dashboard}">Personal space</a><a th:href="@{/teams}">All team workspaces</a><a th:each="option : ${workspaceOptions}" th:href="@{/workspaces/{id}(id=${option.id})}"><span th:text="${option.name}">Workspace</span><small th:text="${option.role}">MEMBER</small></a></nav>
+        </details>
+        <div class="workspace-switcher" th:if="${currentUser == null}"><span class="workspace-switcher-icon" aria-hidden="true">T</span><span><small>Public preview</small><strong>Personal space</strong></span></div>
+        <nav class="side-nav" aria-label="Main">
+            <p class="nav-caption">OVERVIEW</p>
+            <a class="side-link" th:classappend="${activeNav == 'dashboard' ? 'active' : ''}" th:href="@{/dashboard}" th:attr="aria-current=${activeNav == 'dashboard' ? 'page' : null}"><span class="side-icon" aria-hidden="true">⌂</span><span>Dashboard</span></a>
+            <a class="side-link" data-advanced-nav="true" th:classappend="${activeNav == 'analytics' ? 'active' : ''}" th:href="@{/analytics}" th:attr="aria-current=${activeNav == 'analytics' ? 'page' : null}"><span class="side-icon" aria-hidden="true">▥</span><span>Analytics</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'my-day' ? 'active' : ''}" th:href="@{/my-day}" th:attr="aria-current=${activeNav == 'my-day' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◷</span><span>My Day</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'ai' ? 'active' : ''}" th:href="@{/ai}" th:attr="aria-current=${activeNav == 'ai' ? 'page' : null}"><span class="side-icon" aria-hidden="true">✦</span><span>AI Copilot</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'browser' ? 'active' : ''}" th:href="@{/browser}" th:attr="aria-current=${activeNav == 'browser' ? 'page' : null}"><span class="side-icon" aria-hidden="true">↗</span><span>Browser Studio</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'memory' ? 'active' : ''}" th:href="@{/settings/memory}" th:attr="aria-current=${activeNav == 'memory' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◈</span><span>Memory settings</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'knowledge' ? 'active' : ''}" th:href="@{/knowledge}" th:attr="aria-current=${activeNav == 'knowledge' ? 'page' : null}"><span class="side-icon" aria-hidden="true">▤</span><span>Knowledge library</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'agents' ? 'active' : ''}" th:href="@{/agents}" th:attr="aria-current=${activeNav == 'agents' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◈</span><span>Agents</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'upcoming' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/tasks/upcoming}" th:attr="aria-current=${activeNav == 'upcoming' ? 'page' : null}"><span class="side-icon" aria-hidden="true">↗</span><span>Upcoming</span></a>
+            <p class="nav-caption nav-caption-spaced">TASK MANAGEMENT</p>
+            <a class="side-link" th:classappend="${activeNav == 'tasks' ? 'active' : ''}" th:href="@{/tasks}" th:attr="aria-current=${activeNav == 'tasks' ? 'page' : null}"><span class="side-icon" aria-hidden="true">▦</span><span>Tasks</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'today' ? 'active' : ''}" th:href="@{/tasks/today}" th:attr="aria-current=${activeNav == 'today' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◉</span><span>Today</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'tomorrow' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/tasks/tomorrow}" th:attr="aria-current=${activeNav == 'tomorrow' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◷</span><span>Tomorrow</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'overdue' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/tasks/overdue}" th:attr="aria-current=${activeNav == 'overdue' ? 'page' : null}"><span class="side-icon" aria-hidden="true">!</span><span>Overdue</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'completed' ? 'active' : ''}" th:href="@{/tasks(status='COMPLETED')}" th:attr="aria-current=${activeNav == 'completed' ? 'page' : null}"><span class="side-icon" aria-hidden="true">✓</span><span>Completed</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'tags' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/tags}" th:attr="aria-current=${activeNav == 'tags' ? 'page' : null}"><span class="side-icon" aria-hidden="true">⌑</span><span>Tags</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'productivity' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/productivity}" th:attr="aria-current=${activeNav == 'productivity' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◎</span><span>Productivity</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'automations' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/automations}" th:attr="aria-current=${activeNav == 'automations' ? 'page' : null}"><span class="side-icon" aria-hidden="true">↻</span><span>Automations</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'projects' ? 'active' : ''}" th:href="@{/projects}" th:attr="aria-current=${activeNav == 'projects' ? 'page' : null}"><span class="side-icon" aria-hidden="true">▱</span><span>Projects</span></a>
+            <p class="nav-caption nav-caption-spaced">COLLABORATION</p>
+            <a class="side-link" data-advanced-nav="true" th:classappend="${activeNav == 'teams' ? 'active' : ''}" th:href="@{/teams}" th:attr="aria-current=${activeNav == 'teams' ? 'page' : null}"><span class="side-icon" aria-hidden="true">⌂</span><span>Team workspaces</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'communications' ? 'active' : ''}" th:href="@{/communications}" th:attr="aria-current=${activeNav == 'communications' ? 'page' : null}"><span class="side-icon" aria-hidden="true">✉</span><span>Communications</span></a>
+            <a class="side-link" data-advanced-nav="true" th:href="@{/assigned-to-me}"><span class="side-icon" aria-hidden="true">↙</span><span>Assigned to me</span></a>
+            <a class="side-link" data-advanced-nav="true" th:href="@{/notifications}"><span class="side-icon" aria-hidden="true">◉</span><span>Notifications</span></a>
+            <p class="nav-caption nav-caption-spaced">OUTCOMES &amp; HABITS</p>
+            <a class="side-link" th:classappend="${activeNav == 'goals' ? 'active' : ''}" th:href="@{/goals}" th:attr="aria-current=${activeNav == 'goals' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◎</span><span>Goals</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'okrs' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/okrs}" th:attr="aria-current=${activeNav == 'okrs' ? 'page' : null}"><span class="side-icon" aria-hidden="true">↗</span><span>OKRs</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'habits' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/habits}" th:attr="aria-current=${activeNav == 'habits' ? 'page' : null}"><span class="side-icon" aria-hidden="true">↻</span><span>Habits</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'reviews' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/reviews/weekly}" th:attr="aria-current=${activeNav == 'reviews' ? 'page' : null}"><span class="side-icon" aria-hidden="true">◷</span><span>Reviews</span></a>
+            <p class="nav-caption nav-caption-spaced">TIME &amp; FOCUS</p>
+            <a class="side-link" th:classappend="${activeNav == 'time' ? 'active' : ''}" th:href="@{/time}"><span class="side-icon" aria-hidden="true">◷</span><span>Time center</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'calendar' ? 'active' : ''}" th:href="@{/calendar}"><span class="side-icon" aria-hidden="true">▦</span><span>Calendar</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'time-blocks' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/time/blocks}"><span class="side-icon" aria-hidden="true">▣</span><span>Time blocks</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'pomodoro' ? 'active' : ''}" th:href="@{/focus/pomodoro}"><span class="side-icon" aria-hidden="true">◉</span><span>Focus sessions</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'tracking' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/time/tracking}"><span class="side-icon" aria-hidden="true">◴</span><span>Time tracking</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'recurring' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/tasks/recurring}"><span class="side-icon" aria-hidden="true">↻</span><span>Recurring tasks</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'reminders' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/reminders}"><span class="side-icon" aria-hidden="true">♢</span><span>Reminders</span></a>
+            <a class="side-link" th:classappend="${activeNav == 'insights' ? 'active' : ''}" data-advanced-nav="true" th:href="@{/time/insights}"><span class="side-icon" aria-hidden="true">▤</span><span>Time insights</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-status"><span class="status-orb" aria-hidden="true"></span><span><strong>TASK OS</strong><small>One connected workspace</small></span></div>
+            <a class="side-link mobile-account-link" th:if="${currentUser != null}" th:href="@{/profile}"><span class="side-icon" aria-hidden="true">◉</span><span>Account settings</span></a>
+            <form class="mobile-logout-form" th:if="${currentUser != null}" th:action="@{/logout}" method="post"><button class="side-link" type="submit"><span class="side-icon" aria-hidden="true">↪</span><span>Sign out</span></button></form>
+            <a class="side-link" th:href="@{/about}"><span class="side-icon" aria-hidden="true">ⓘ</span><span>About TASK OS</span></a>
+        </div>
+    </aside>
+    <section class="workspace-main">
+        <header class="workspace-topbar">
+            <div class="topbar-start">
+                <button class="icon-button sidebar-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="workspace-sidebar" data-sidebar-toggle><span aria-hidden="true">☰</span></button>
+                <span class="breadcrumb"><span>Workspace</span><span class="breadcrumb-divider" aria-hidden="true">/</span><strong th:switch="${activeNav}"><span th:case="'ai'">AI Copilot</span><span th:case="'my-day'">My Day</span><span th:case="'okrs'">OKRs</span><span th:case="'pomodoro'">Focus sessions</span><span th:case="'tracking'">Time tracking</span><span th:case="'teams'">Team workspaces</span><span th:case="'insights'">Time insights</span><span th:case="*" th:text="${activeNav == null ? 'Workspace' : #strings.capitalize(#strings.replace(activeNav, '-', ' '))}">Workspace</span></strong></span>
+            </div>
+            <div class="topbar-end">
+                <button class="command-trigger" type="button" data-command-open aria-haspopup="dialog" aria-controls="global-command-dialog" aria-label="Search pages, tasks, and projects"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m16 16 4.5 4.5"></path></svg><span>Search</span><kbd>Ctrl K</kbd></button>
+                <button class="experience-mode-toggle" type="button" data-experience-mode-toggle aria-label="Advanced workspace mode" aria-pressed="false" aria-describedby="experience-mode-help">Advanced</button>
+                <span class="sr-only" id="experience-mode-help">Show or hide detailed tools in the workspace navigation.</span>
+                <a class="topbar-help" th:href="@{/about}">About</a>
+                <label th:if="${currentUser == null}" class="theme-control"><span class="theme-icon" aria-hidden="true">◐</span><span class="sr-only">Color theme</span><select data-theme-select aria-label="Color theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+                <a th:if="${currentUser != null}" class="topbar-account" th:href="@{/profile}"><span class="user-avatar" aria-hidden="true" th:text="${#strings.substring(currentUser.displayName, 0, 1).toUpperCase()}">A</span><span th:text="${currentUser.displayName}">Account</span></a>
+                <a th:if="${currentUser == null}" class="topbar-help" th:href="@{/login}">Sign in</a>
+                <form th:if="${currentUser != null}" class="topbar-logout-form" th:action="@{/logout}" method="post"><button class="topbar-logout" type="submit">Sign out</button></form>
+            </div>
+        </header>
+        <main class="workspace-content" id="main-content" th:replace="${pageContent}"></main>
+    </section>
+</div>
+<nav class="mobile-primary-nav" aria-label="Primary navigation">
+    <a th:href="@{/dashboard}" th:classappend="${activeNav == 'dashboard' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'dashboard' ? 'page' : null}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10.5h-6v-6h-5v6h-6z"></path></svg><span>Home</span></a>
+    <a th:href="@{/tasks}" th:classappend="${activeNav == 'tasks' or activeNav == 'today' or activeNav == 'tomorrow' or activeNav == 'upcoming' or activeNav == 'overdue' or activeNav == 'completed' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'tasks' or activeNav == 'today' or activeNav == 'tomorrow' or activeNav == 'upcoming' or activeNav == 'overdue' or activeNav == 'completed' ? 'page' : null}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="2.5"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg><span>Tasks</span></a>
+    <a th:href="@{/ai}" th:classappend="${activeNav == 'ai' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'ai' ? 'page' : null}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 1.7 6.3L20 10l-6.3 1.7L12 18l-1.7-6.3L4 10l6.3-1.7z"></path><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"></path></svg><span>Ask AI</span></a>
+    <a th:href="@{/calendar}" th:classappend="${activeNav == 'calendar' ? 'active' : ''}" th:attr="aria-current=${activeNav == 'calendar' ? 'page' : null}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2"></rect><path d="M7.5 3v4M16.5 3v4M3.5 9h17M8 13h2M14 13h2M8 17h2"></path></svg><span>Calendar</span></a>
+    <button type="button" data-more-toggle aria-controls="workspace-sidebar" aria-expanded="false" aria-label="More navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle></svg><span>More</span></button>
+</nav>
+<dialog class="command-dialog" id="global-command-dialog" data-command-dialog aria-labelledby="global-command-title">
+    <div class="command-panel">
+        <h2 class="sr-only" id="global-command-title">Search TASK OS</h2>
+        <div class="command-search-row"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.3"></circle><path d="m16 16 4.5 4.5"></path></svg><label class="sr-only" for="global-command-search">Search pages, tasks, and projects</label><input id="global-command-search" type="search" maxlength="120" placeholder="Search pages, tasks, or projects…" autocomplete="off" data-command-input><kbd>ESC</kbd><button class="icon-button" type="button" data-command-close aria-label="Close search">×</button></div>
+        <div class="command-results">
+            <section class="command-result-group" aria-labelledby="command-search-heading"><h2 id="command-search-heading">Search your work</h2><a class="command-result" href="/tasks" data-command-task-search hidden><span><strong>Search tasks</strong><small data-command-task-label></small></span><span aria-hidden="true">↗</span></a><a class="command-result" href="/projects" data-command-project-search hidden><span><strong>Search projects</strong><small data-command-project-label></small></span><span aria-hidden="true">↗</span></a><p class="command-hint" data-command-search-hint>Task and project results use your existing access permissions.</p></section>
+            <section class="command-result-group" aria-labelledby="command-pages-heading"><h2 id="command-pages-heading">Go to</h2><ul class="command-page-list" data-command-pages>
+                <li><a class="command-result" href="/dashboard" data-command-item data-command-search="home dashboard"><span><strong>Dashboard</strong><small>Overview and today's priorities</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/tasks" data-command-item data-command-search="tasks my tasks"><span><strong>My tasks</strong><small>Search, filter, and update tasks</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/tasks/new" data-command-item data-command-search="create task new task"><span><strong>Create a task</strong><small>Capture a new task</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/my-day" data-command-item data-command-search="my day plan day"><span><strong>Plan my day</strong><small>Review today's work</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/calendar" data-command-item data-command-search="calendar schedule"><span><strong>Calendar</strong><small>View your schedule</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/knowledge" data-command-item data-command-search="documents knowledge library search"><span><strong>Knowledge library</strong><small>Search your uploaded source documents</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/settings/memory" data-command-item data-command-search="memory settings preferences context"><span><strong>Memory settings</strong><small>Manage confirmed personal context</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/ai" data-command-item data-command-search="ai assistant copilot"><span><strong>Ask AI</strong><small>Open the AI Copilot</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/communications" data-command-item data-command-search="communications email messages meetings connections"><span><strong>Communications</strong><small>Review communication account status</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/projects" data-command-item data-command-search="projects"><span><strong>Projects</strong><small>Manage projects and boards</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/analytics" data-command-item data-command-search="analytics reports" data-advanced-nav="true" th:classappend="${activeNav == 'analytics' ? 'active' : ''}"><span><strong>Analytics</strong><small>Review measured activity</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/automations" data-command-item data-command-search="automation workflows" data-advanced-nav="true" th:classappend="${activeNav == 'automations' ? 'active' : ''}"><span><strong>Automations</strong><small>Manage workflow rules</small></span><span aria-hidden="true">↗</span></a></li>
+                <li><a class="command-result" href="/teams" data-command-item data-command-search="teams workspaces" data-advanced-nav="true" th:classappend="${activeNav == 'teams' ? 'active' : ''}"><span><strong>Workspaces</strong><small>Open team collaboration</small></span><span aria-hidden="true">↗</span></a></li>
+            </ul><p class="command-hint" role="status" aria-live="polite" data-command-status></p></section>
+        </div>
+    </div>
+</dialog>
+</body>
+</html>

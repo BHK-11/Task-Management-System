@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Upcoming — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content dashboard-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <header class="dashboard-view-heading"><div><p class="eyebrow">DEADLINES</p><h1>Upcoming tasks</h1><p>Tomorrow, the next seven calendar days, then later due dates. Today is excluded.</p></div><a class="button button-primary" th:href="@{/tasks/new}">+ New task</a></header>
+    <div class="dashboard-upcoming-groups">
+        <section class="dashboard-panel" aria-labelledby="tomorrow-group-heading"><div class="dashboard-panel-heading"><div><p class="eyebrow">NEXT DAY</p><h2 id="tomorrow-group-heading">Tomorrow</h2></div><span class="dashboard-group-count" th:text="${#lists.size(upcomingPage.tomorrow)}">0</span></div><div th:replace="~{dashboard/fragments :: taskList(${upcomingPage.tomorrow}, 'upcoming')}"></div><p class="dashboard-list-empty" th:if="${#lists.isEmpty(upcomingPage.tomorrow)}">No tasks due tomorrow.</p></section>
+        <section class="dashboard-panel" aria-labelledby="week-group-heading"><div class="dashboard-panel-heading"><div><p class="eyebrow">NEXT 7 CALENDAR DAYS</p><h2 id="week-group-heading">Following six days</h2><p>After tomorrow through seven days from today.</p></div><span class="dashboard-group-count" th:text="${#lists.size(upcomingPage.nextSevenDays)}">0</span></div><div th:replace="~{dashboard/fragments :: taskList(${upcomingPage.nextSevenDays}, 'upcoming')}"></div><p class="dashboard-list-empty" th:if="${#lists.isEmpty(upcomingPage.nextSevenDays)}">No due dates in this part of the week.</p></section>
+        <section class="dashboard-panel" aria-labelledby="later-group-heading"><div class="dashboard-panel-heading"><div><p class="eyebrow">AFTER THE NEXT WEEK</p><h2 id="later-group-heading">Later</h2></div><span class="dashboard-group-count" th:text="${#lists.size(upcomingPage.later)}">0</span></div><div th:replace="~{dashboard/fragments :: taskList(${upcomingPage.later}, 'upcoming')}"></div><p class="dashboard-list-empty" th:if="${#lists.isEmpty(upcomingPage.later)}">No later due dates in this page.</p></section>
+    </div>
+    <nav class="dashboard-pagination" th:if="${upcomingPage.hasPrevious or upcomingPage.hasNext}" aria-label="Upcoming task pages"><a th:if="${upcomingPage.hasPrevious}" th:href="@{/tasks/upcoming(page=${upcomingPage.page - 1})}">← Previous</a><span th:text="${'Page ' + (upcomingPage.page + 1)}">Page 1</span><a th:if="${upcomingPage.hasNext}" th:href="@{/tasks/upcoming(page=${upcomingPage.page + 1})}">Next →</a></nav>
+    <p class="dashboard-page-footnote">Upcoming metric: active top-level tasks due tomorrow through seven calendar days from today, inclusive.</p>
+</main>
+</body>
+</html>

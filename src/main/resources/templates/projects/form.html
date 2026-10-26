@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Project — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content project-page">
+    <header class="project-heading"><div><p class="eyebrow">PROJECT SETUP</p><h1 th:text="${editing ? 'Edit project' : 'Create a project'}">Create a project</h1><p>Project tasks remain your existing TASK OS tasks, with a project board view.</p></div><a class="button button-quiet" th:href="${editing ? '/projects/' + projectId + '/settings' : '/projects'}">Cancel</a></header>
+    <form class="project-form project-panel" method="post" th:action="${editing ? '/projects/' + projectId : '/projects'}" th:object="${projectForm}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input th:if="${editing}" type="hidden" th:field="*{version}">
+        <div class="task-flash task-flash-error" role="alert" th:if="${#fields.hasGlobalErrors()}"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}">Check the project details.</p></div>
+        <div class="project-form-grid">
+            <label class="project-field project-field-wide">Project name<input th:field="*{name}" maxlength="160" required aria-describedby="name-error"><small class="field-error" id="name-error" th:errors="*{name}"></small></label>
+            <label class="project-field project-field-wide">Description<textarea th:field="*{description}" maxlength="2000" rows="4"></textarea><small th:errors="*{description}"></small></label>
+            <label class="project-field">Status<select th:field="*{status}"><option th:each="status : ${projectStatuses}" th:value="${status}" th:text="${#strings.replace(status.name(), '_', ' ')}"></option></select><small th:errors="*{status}"></small></label>
+            <label class="project-field">Color<input type="color" th:field="*{color}"><small th:errors="*{color}"></small></label>
+            <label class="project-field">Start date<input type="date" th:field="*{startDate}"></label>
+            <label class="project-field">Target date<input type="date" th:field="*{targetEndDate}"><small th:errors="*{dateRangeValid}"></small></label>
+            <label class="project-field project-field-wide" th:if="${!editing}">Start from a template<select name="templateId"><option value="">Blank project</option><option th:each="template : ${templates}" th:value="${template.id}" th:selected="${template.id == selectedTemplate}" th:text="${template.name}"></option></select><small>Templates can include workflow columns, milestones, and optional task examples.</small></label>
+        </div>
+        <div class="project-form-actions"><button class="button button-primary" type="submit" th:text="${editing ? 'Save changes' : 'Create project'}">Create project</button><a class="button button-quiet" th:href="${editing ? '/projects/' + projectId + '/settings' : '/projects'}">Cancel</a></div>
+    </form>
+    <section class="project-panel project-template-preview" th:if="${templatePreview != null}"><p class="eyebrow">TEMPLATE PREVIEW</p><h2>Included project structure</h2><p th:text="${#lists.size(templatePreview.columns) + ' workflow columns · ' + #lists.size(templatePreview.milestones) + ' milestones · ' + #lists.size(templatePreview.tasks) + ' task examples'}">Template contents</p><ul><li th:each="column : ${templatePreview.columns}" th:text="${column.position + 1 + '. ' + column.name}">To Do</li></ul></section>
+</main></body></html>

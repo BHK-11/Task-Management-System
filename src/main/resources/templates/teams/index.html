@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Teams — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <header class="project-heading"><div><p class="eyebrow">COLLABORATION</p><h1>Team workspaces</h1><p>Keep shared projects and assigned work separate from your personal space.</p></div><a class="button button-primary" th:href="@{/workspaces/new}">Create workspace <span aria-hidden="true">＋</span></a></header>
+    <section class="team-workspace-grid" aria-label="Your workspaces" th:if="${!workspaces.empty}">
+        <article class="team-workspace-card" th:each="workspace : ${workspaces}">
+            <div class="team-card-mark" aria-hidden="true">T</div><div class="team-card-copy">
+                <div class="team-card-heading"><h2><a th:href="@{/workspaces/{id}(id=${workspace.id})}" th:text="${workspace.name}">Workspace</a></h2><span class="team-role" th:text="${workspace.role}">MEMBER</span></div>
+                <p th:text="${#strings.isEmpty(workspace.description) ? 'No workspace description.' : workspace.description}">Description</p>
+                <div class="team-card-metrics"><span th:text="${workspace.members + ' members'}">0 members</span><span th:text="${workspace.projects + ' projects'}">0 projects</span><span th:text="${workspace.openTasks + ' open tasks'}">0 open tasks</span></div>
+            </div><a class="project-open-link" th:href="@{/workspaces/{id}(id=${workspace.id})}" aria-label="Open workspace">Open <span aria-hidden="true">→</span></a>
+        </article>
+    </section>
+    <section class="team-empty project-panel" th:if="${workspaces.empty}"><span class="team-empty-mark" aria-hidden="true">⌂</span><h2>Your team space starts here</h2><p>Create a private workspace, then invite only the people who should see its projects and tasks.</p><a class="button button-primary" th:href="@{/workspaces/new}">Create a workspace</a></section>
+    <section class="team-quick-links" aria-label="Collaboration shortcuts">
+        <a class="team-quick-link" th:href="@{/assigned-to-me}"><span class="team-quick-icon" aria-hidden="true">↙</span><span><strong>Assigned to me</strong><small>Shared tasks across your active workspaces</small></span><span aria-hidden="true">→</span></a>
+        <a class="team-quick-link" th:href="@{/notifications}"><span class="team-quick-icon" aria-hidden="true">◉</span><span><strong>Team notifications</strong><small>Assignments and direct mentions</small></span><span aria-hidden="true">→</span></a>
+    </section>
+</main></body></html>

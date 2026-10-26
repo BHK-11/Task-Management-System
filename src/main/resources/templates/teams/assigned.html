@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Assigned to me — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <header class="project-heading"><div><p class="eyebrow">YOUR SHARED WORK</p><h1>Assigned to me</h1><p>One canonical task stays in its workspace. This view does not create a personal copy.</p></div></header>
+    <section class="team-task-list" th:if="${!assignedTasks.empty}" aria-label="Tasks assigned to you">
+        <article class="team-task-row" th:each="item : ${assignedTasks}">
+            <span class="team-task-priority" th:classappend="' priority-' + ${#strings.toLowerCase(item.task.priority.name())}" aria-hidden="true"></span>
+            <span class="team-list-copy"><a class="team-task-title" th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${item.workspace.id},taskId=${item.task.id})}" th:text="${item.task.title}">Task</a><small><a th:href="@{/workspaces/{id}(id=${item.workspace.id})}" th:text="${item.workspace.name}">Workspace</a><span th:text="${' · ' + item.projectName + ' · ' + #strings.replace(item.task.status.name(), '_', ' ')}">· project · status</span><span th:if="${item.task.dueDate != null}" th:text="${' · due ' + #temporals.format(item.task.dueDate, 'MMM d')}">· due date</span></small></span>
+            <span class="team-role" th:text="${item.task.priority}">MEDIUM</span><a class="project-open-link" th:href="@{/workspaces/{workspaceId}/tasks/{taskId}(workspaceId=${item.workspace.id},taskId=${item.task.id})}">Open <span aria-hidden="true">→</span></a>
+        </article>
+    </section>
+    <section class="team-empty project-panel" th:if="${assignedTasks.empty}"><span class="team-empty-mark" aria-hidden="true">↙</span><h2>No assigned shared work</h2><p>Tasks assigned to your active workspace account will appear here.</p><a class="button button-primary" th:href="@{/teams}">Open team workspaces</a></section>
+</main></body></html>

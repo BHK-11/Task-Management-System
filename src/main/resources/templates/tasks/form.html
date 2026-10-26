@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${editing ? 'Edit task — TASK OS' : 'New task — TASK OS'}">Task — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content task-form-page">
+    <p class="eyebrow eyebrow-muted"><a th:href="@{/tasks}">TASKS</a> / <span th:text="${editing ? 'EDIT' : 'NEW'}">NEW</span></p>
+    <header class="task-page-heading"><div><h1 th:text="${editing ? 'Edit task' : 'Create a task'}">Create a task</h1><p>Give the task a clear title and add the details that help you move it forward.</p></div></header>
+    <div class="task-flash task-flash-error" role="alert" th:if="${conflict}">This task changed since you opened it. Review the latest version and save again.</div>
+    <form class="task-card task-edit-form" method="post" th:action="${taskAction}" th:object="${taskForm}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <input type="hidden" th:field="*{version}" th:if="${editing}">
+        <div class="task-form-errors" role="alert" th:if="${#fields.hasGlobalErrors()}"><p th:each="error : ${#fields.globalErrors()}" th:text="${error}">Check the task details.</p></div>
+        <div class="task-form-grid">
+            <div class="form-field task-form-wide"><label for="task-title">Title</label><input id="task-title" type="text" maxlength="160" required autofocus th:field="*{title}" th:attr="aria-invalid=${#fields.hasErrors('title')}" aria-describedby="task-title-error"><p class="field-error" id="task-title-error" th:errors="*{title}"></p></div>
+            <div class="form-field task-form-wide"><label for="task-description">Description <span class="muted-text">(optional)</span></label><textarea id="task-description" rows="6" maxlength="6000" th:field="*{description}" th:attr="aria-invalid=${#fields.hasErrors('description')}" aria-describedby="task-description-error"></textarea><p class="field-error" id="task-description-error" th:errors="*{description}"></p></div>
+            <div class="form-field"><label for="task-status">Status</label><select id="task-status" th:field="*{status}"><option th:each="status : ${statuses}" th:value="${status}" th:text="${#strings.replace(status.name(), '_', ' ')}"></option></select><p class="field-error" th:errors="*{status}"></p></div>
+            <div class="form-field"><label for="task-priority">Priority</label><select id="task-priority" th:field="*{priority}"><option th:each="priority : ${priorities}" th:value="${priority}" th:text="${priority}"></option></select><p class="field-error" th:errors="*{priority}"></p></div>
+            <div class="form-field"><label for="task-start">Start date <span class="muted-text">(optional)</span></label><input id="task-start" type="date" th:field="*{startDate}" th:attr="aria-invalid=${#fields.hasErrors('dateRangeValid')}" aria-describedby="task-date-error"></div>
+            <div class="form-field"><label for="task-due">Due date <span class="muted-text">(optional)</span></label><input id="task-due" type="date" th:field="*{dueDate}" th:attr="aria-invalid=${#fields.hasErrors('dateRangeValid')}" aria-describedby="task-date-error"><p class="field-error" id="task-date-error" th:errors="*{dateRangeValid}"></p></div>
+            <fieldset class="task-form-wide task-tag-picker"><legend>Tags <span class="muted-text">(optional, up to 10)</span></legend><p class="muted-text" th:if="${#lists.isEmpty(tags)}">You have no tags yet. <a th:href="@{/tags}">Create one</a>.</p><div class="task-tag-options" th:unless="${#lists.isEmpty(tags)}"><label th:each="tag : ${tags}"><input type="checkbox" th:field="*{tagIds}" th:value="${tag.id}"><span th:text="${tag.name}">Planning</span></label></div><p class="field-error" th:errors="*{tagIds}"></p></fieldset>
+        </div>
+        <div class="task-form-actions"><a class="button button-quiet" th:href="${editing ? '/tasks/' + taskId : '/tasks'}">Cancel</a><button class="button button-primary" type="submit" th:text="${editing ? 'Save changes' : 'Create task'}">Create task</button></div>
+    </form>
+</main>
+</body>
+</html>

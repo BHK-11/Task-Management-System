@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Projects — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content project-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <header class="project-heading">
+        <div><p class="eyebrow">PROJECT WORKSPACE</p><h1>Projects</h1><p>Keep project plans, canonical tasks and delivery progress together.</p></div>
+        <div class="project-heading-actions"><a class="button button-quiet" th:href="@{/projects/templates}">Template library</a><a class="button button-primary" th:href="@{/projects/new}">New project <span aria-hidden="true">＋</span></a></div>
+    </header>
+    <section class="project-stat-grid" aria-label="Project summary"><div class="project-stat"><span>Active projects</span><strong th:text="${activeProjects}">0</strong><small>Not archived</small></div><div class="project-stat"><span>On this page</span><strong th:text="${projectPage.totalElements}">0</strong><small>Matches your filters</small></div></section>
+    <section class="project-panel" aria-label="Search and filter projects">
+        <form class="project-filter" method="get" th:action="@{/projects}">
+            <label>Search<input type="search" name="q" maxlength="100" th:value="${query}" placeholder="Project name or description"></label>
+            <label>Status<select name="status"><option value="">All statuses</option><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == selectedStatus}" th:text="${#strings.replace(status.name(), '_', ' ')}"></option></select></label>
+            <label>Show<select name="archived"><option value="" th:selected="${archived == null}">Active and archived</option><option value="false" th:selected="${archived == false}">Active</option><option value="true" th:selected="${archived == true}">Archived</option></select></label>
+            <button class="button button-primary" type="submit">Apply filters</button>
+        </form>
+    </section>
+    <section class="project-list" aria-label="Projects" th:if="${!projectPage.empty}">
+        <article class="project-list-card" th:each="project : ${projectPage.content}" th:style="'--project-color:' + ${project.color}">
+            <span class="project-color-mark" aria-hidden="true"></span><div class="project-list-copy"><div class="project-card-title"><a th:href="@{/projects/{id}(id=${project.id})}" th:text="${project.name}">Project name</a><span class="project-state" th:text="${#strings.replace(project.status.name(), '_', ' ')}">ACTIVE</span><span class="project-state project-state-muted" th:if="${project.archivedAt != null}">ARCHIVED</span></div>
+                <p th:text="${#strings.isEmpty(project.description) ? 'No description added.' : project.description}">Description</p><small th:text="${project.targetEndDate != null ? 'Target ' + #temporals.format(project.targetEndDate, 'MMM d, yyyy') : 'No target date'}">No target date</small></div>
+            <a class="project-open-link" th:href="@{/projects/{id}(id=${project.id})}" aria-label="Open project">Open <span aria-hidden="true">→</span></a>
+        </article>
+    </section>
+    <div class="project-empty project-panel" th:if="${projectPage.empty}"><h2>No matching projects</h2><p>Create a project or adjust the search filters.</p><a class="button button-primary" th:href="@{/projects/new}">Create a project</a></div>
+    <nav class="project-pagination" th:if="${projectPage.totalPages > 1}" aria-label="Project pages">
+        <a th:if="${projectPage.hasPrevious()}" th:href="@{/projects(q=${query}, status=${selectedStatus}, archived=${archived}, page=${projectPage.number - 1})}">Previous</a><span th:text="${'Page ' + (projectPage.number + 1) + ' of ' + projectPage.totalPages}">Page 1</span><a th:if="${projectPage.hasNext()}" th:href="@{/projects(q=${query}, status=${selectedStatus}, archived=${archived}, page=${projectPage.number + 1})}">Next</a>
+    </nav>
+</main></body></html>

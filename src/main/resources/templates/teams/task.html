@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Shared task — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspace.id})}">← <span th:text="${workspace.name}">Workspace</span></a>
+    <header class="project-heading"><div><p class="eyebrow">SHARED TASK <span class="team-role" th:text="${task.priority}">MEDIUM</span></p><h1 th:text="${task.title}">Task</h1><p th:text="${#strings.isEmpty(task.description) ? 'No description added.' : task.description}">Description</p></div></header>
+    <section class="team-task-detail-grid">
+        <article class="project-panel team-task-controls">
+            <div class="team-section-head"><div><p class="eyebrow">WORK STATUS</p><h2>Task details</h2></div></div>
+            <dl class="team-task-facts"><div><dt>Priority</dt><dd th:text="${task.priority}">MEDIUM</dd></div><div><dt>Due date</dt><dd th:text="${task.dueDate != null ? #temporals.format(task.dueDate, 'MMM d, yyyy') : 'No due date'}">No due date</dd></div><div><dt>Last updated</dt><dd th:text="${#temporals.format(task.updatedAt, 'MMM d, yyyy · HH:mm')}">Today</dd></div></dl>
+            <form class="team-form" th:if="${canEdit and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{workspaceId}/tasks/{taskId}/status(workspaceId=${workspace.id},taskId=${task.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label for="task-status">Status</label><div class="team-inline-form"><select id="task-status" name="status"><option th:each="status : ${statuses}" th:value="${status}" th:selected="${status == task.status}" th:text="${#strings.replace(status.name(), '_', ' ')}">TODO</option></select><button class="button button-quiet" type="submit">Save status</button></div>
+            </form>
+            <form class="team-form" th:if="${canEdit and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{workspaceId}/tasks/{taskId}/assignment(workspaceId=${workspace.id},taskId=${task.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label for="task-assignee">Primary assignee</label><div class="team-inline-form"><select id="task-assignee" name="assigneeId"><option value="">Unassigned</option><option th:each="member : ${members}" th:if="${member.role.name() != 'VIEWER'}" th:value="${member.user.id}" th:selected="${assignee != null and member.user.id == assignee.user.id}" th:text="${member.user.displayName}">Member</option></select><button class="button button-primary" type="submit">Update assignment</button></div>
+            </form>
+            <div class="team-assignee-summary"><span class="team-quick-icon" aria-hidden="true">↙</span><span><small>Assigned to</small><strong th:text="${assignee != null ? assignee.user.displayName : 'No one yet'}">Unassigned</strong></span></div>
+        </article>
+        <article class="project-panel team-comments-panel">
+            <div class="team-section-head"><div><p class="eyebrow">DISCUSSION</p><h2>Comments <span class="team-role" th:text="${comments.size()}">0</span></h2></div></div>
+            <div class="team-comment-list" th:if="${!comments.empty}">
+                <article class="team-comment" th:each="comment : ${comments}">
+                    <div class="team-comment-head"><span class="user-avatar team-member-avatar" aria-hidden="true" th:text="${#strings.substring(comment.authorName, 0, 1).toUpperCase()}">A</span><span><strong th:text="${comment.authorName}">Author</strong><small th:text="${#temporals.format(comment.createdAt, 'MMM d, yyyy · HH:mm')}">Time</small></span><span class="team-edited-mark" th:if="${comment.editedAt != null}">Edited</span></div>
+                    <p class="team-comment-body" th:text="${comment.body}">Comment text</p>
+                    <div class="team-mentions" th:if="${!comment.mentions.empty}"><span>Mentioned</span><span class="team-mention-chip" th:each="mention : ${comment.mentions}" th:text="${mention}">Member</span></div>
+                    <details class="team-comment-edit" th:if="${comment.editable and canEdit and workspace.status.name() == 'ACTIVE'}"><summary>Edit comment</summary>
+                        <form class="team-form" method="post" th:action="@{/workspaces/{workspaceId}/tasks/{taskId}/comments/{commentId}/edit(workspaceId=${workspace.id},taskId=${task.id},commentId=${comment.id})}">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label th:for="${'comment-edit-' + comment.id}">Edit comment</label><textarea name="body" maxlength="2000" rows="3" th:id="${'comment-edit-' + comment.id}" th:text="${comment.body}" required></textarea>
+                            <fieldset class="team-mention-picker"><legend>Mentions</legend><label th:each="member : ${members}" th:for="${'edit-mention-' + comment.id + '-' + member.user.id}"><input type="checkbox" name="mentionIds" th:value="${member.user.id}" th:id="${'edit-mention-' + comment.id + '-' + member.user.id}" th:checked="${comment.mentionIds.contains(member.user.id)}"><span th:text="${member.user.displayName}">Member</span></label></fieldset>
+                            <button class="button button-quiet button-small" type="submit">Save edit</button>
+                        </form>
+                    </details>
+                    <form th:if="${comment.editable and canEdit and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{workspaceId}/tasks/{taskId}/comments/{commentId}/delete(workspaceId=${workspace.id},taskId=${task.id},commentId=${comment.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="team-delete-link" type="submit">Delete comment</button>
+                    </form>
+                </article>
+            </div>
+            <div class="team-empty-inline" th:if="${comments.empty}"><strong>No comments yet</strong><span>Keep discussion attached to this shared task.</span></div>
+            <form class="team-form team-comment-composer" th:if="${canEdit and workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{workspaceId}/tasks/{taskId}/comments(workspaceId=${workspace.id},taskId=${task.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label for="new-comment">Add a comment</label><textarea id="new-comment" name="body" maxlength="2000" rows="4" required placeholder="Write an update for the team"></textarea>
+                <fieldset class="team-mention-picker"><legend>Mention members</legend><label th:each="member : ${members}" th:for="${'new-mention-' + member.user.id}"><input type="checkbox" name="mentionIds" th:value="${member.user.id}" th:id="${'new-mention-' + member.user.id}"><span th:text="${member.user.displayName}">Member</span></label></fieldset>
+                <button class="button button-primary" type="submit">Post comment</button>
+            </form>
+            <p class="team-private-note" th:if="${!canEdit}">Viewer access is read-only. Comments and assignments are available to workspace owners, admins and members.</p>
+        </article>
+    </section>
+</main></body></html>

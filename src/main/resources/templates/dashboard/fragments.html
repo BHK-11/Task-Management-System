@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<ul th:fragment="taskList(tasks, returnTo)" class="dashboard-task-list">
+    <li th:each="item : ${tasks}" class="dashboard-task-row">
+        <form class="dashboard-complete" method="post" th:action="@{/tasks/{id}/status(id=${item.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="status" th:value="${item.status.name() == 'COMPLETED' ? 'TODO' : 'COMPLETED'}">
+            <input type="hidden" name="returnTo" th:value="${returnTo}">
+            <button type="submit" th:aria-label="${item.status.name() == 'COMPLETED' ? 'Reopen task: ' + item.title : 'Complete task: ' + item.title}"><span aria-hidden="true" th:text="${item.status.name() == 'COMPLETED' ? '↶' : '✓'}">✓</span></button>
+        </form>
+        <div class="dashboard-task-copy">
+            <a class="dashboard-task-title" th:href="@{/tasks/{id}(id=${item.id})}" th:text="${item.title}">Review the project brief</a>
+            <div class="dashboard-task-meta">
+                <span class="dashboard-reason" th:text="${item.reason}">Due today</span>
+                <span class="dashboard-overdue-days" th:if="${item.daysOverdue > 0}" th:text="${item.daysOverdue == 1 ? '1 day overdue' : item.daysOverdue + ' days overdue'}">1 day overdue</span>
+                <span class="task-priority" th:classappend="${' priority-' + #strings.toLowerCase(item.priority.name())}" th:text="${item.priority}">HIGH</span>
+                <span class="dashboard-status" th:text="${#strings.replace(item.status.name(), '_', ' ')}">IN PROGRESS</span>
+                <span class="dashboard-due" th:if="${item.dueDate != null}" th:text="${#temporals.format(item.dueDate, 'MMM d')}">Oct 20</span>
+                <span class="dashboard-due" th:unless="${item.dueDate != null}">No due date</span>
+            </div>
+            <div class="dashboard-subtask" th:if="${item.hasSubtasks()}">
+                <span th:text="${item.completedSubtaskCount + ' of ' + item.subtaskCount + ' subtasks complete'}">1 of 3 subtasks complete</span>
+                <span class="dashboard-subtask-track" aria-hidden="true"><span th:style="${'width:' + item.subtaskPercent() + '%'}"></span></span>
+            </div>
+        </div>
+        <a class="dashboard-open" th:if="${item.status.name() != 'COMPLETED'}" th:href="@{/tasks/{id}/edit(id=${item.id})}" th:aria-label="${'Edit ' + item.title}">Edit</a>
+    </li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Share project — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspaceId})}">← Back to workspace</a>
+    <header class="project-heading"><div><p class="eyebrow">PRIVACY REVIEW</p><h1>Share this project?</h1><p>Review what active workspace members can see before sharing the existing project.</p></div></header>
+    <section class="project-panel team-share-review">
+        <div class="team-share-project-title"><span class="team-project-mark" aria-hidden="true"></span><div><h2 th:text="${review.project.name}">Project</h2><p th:text="${#strings.isEmpty(review.project.description) ? 'No project description.' : review.project.description}">Description</p></div></div>
+        <div class="team-stat-grid"><article class="team-stat"><span>Tasks becoming visible</span><strong th:text="${review.taskCount}">0</strong><small>Canonical project tasks</small></article><article class="team-stat"><span>Existing history</span><strong th:text="${review.existingActivityCount}">0</strong><small>Kept private from the team</small></article></div>
+        <div class="team-share-task-preview" th:if="${!review.tasks.empty}"><h3>Task details becoming visible</h3><ul><li th:each="placement : ${review.tasks}"><strong th:text="${placement.task.title}">Task title</strong><small th:text="${#strings.isEmpty(placement.task.description) ? 'No description' : placement.task.description}">Task description</small><span th:text="${#strings.replace(placement.task.status.name(), '_', ' ') + ' · ' + placement.task.priority + (placement.task.dueDate == null ? '' : ' · due ' + #temporals.format(placement.task.dueDate, 'MMM d, yyyy'))}">Status · priority · due date</span></li></ul></div>
+        <div class="team-disclosure-grid">
+            <div><h3>Workspace members will see</h3><ul><li>Project name, description, status and dates.</li><li>Linked task titles, descriptions, status, priority and due dates.</li><li>New assignments, comments and activity created after sharing.</li></ul></div>
+            <div><h3>These records stay private</h3><ul><li>Existing project and task activity history.</li><li>Personal time entries, focus history, habits, goals and reminders.</li><li>Private tasks and projects that are not linked to this project.</li></ul></div>
+        </div>
+        <p class="team-review-warning" th:if="${!review.shareable}" role="alert" th:text="${review.restriction}">This project cannot be shared safely.</p>
+        <form th:if="${review.shareable}" method="post" th:action="@{/projects/{id}/share(id=${review.project.id})}" class="team-confirm-share">
+            <input type="hidden" name="workspaceId" th:value="${workspaceId}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label class="project-check-label"><input type="checkbox" name="confirmed" value="true" required> I reviewed the disclosure and want these project tasks visible to the workspace.</label>
+            <button class="button button-primary" type="submit">Share project</button>
+        </form>
+    </section>
+</main></body></html>

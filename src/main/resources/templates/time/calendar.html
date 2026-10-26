@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Calendar — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content time-page calendar-page" data-calendar-page>
+    <div class="task-flash" role="status" th:if="${timeMessage}" th:text="${timeMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${timeError}" th:text="${timeError}"></div>
+    <div class="task-flash time-flash-warning" role="status" th:if="${timeWarning}" th:text="${timeWarning}"></div>
+    <header class="time-heading"><div><p class="eyebrow">YOUR PERSONAL SCHEDULE</p><h1>Calendar</h1><p>Deadlines, project milestones and reserved work blocks in <span th:text="${calendar.timezone}">UTC</span>.</p></div><a class="button button-primary" href="#new-time-block">Add time block</a></header>
+    <section class="calendar-panel" aria-label="Calendar">
+        <div class="calendar-toolbar"><div class="calendar-period-controls"><a class="icon-button" th:href="@{/calendar(view=${calendar.view},date=${calendar.previousDate})}" aria-label="Previous period">←</a><h2 th:text="${calendar.title}">October 2026</h2><a class="icon-button" th:href="@{/calendar(view=${calendar.view},date=${calendar.nextDate})}" aria-label="Next period">→</a><a class="button button-quiet" th:href="@{/calendar(view=${calendar.view},date=${calendar.today})}">Today</a></div>
+            <div class="calendar-view-controls" role="group" aria-label="Calendar view"><a th:each="option : ${ {'month','week','day'} }" th:href="@{/calendar(view=${option},date=${calendar.selectedDate})}" th:classappend="${calendar.view == option ? 'is-selected' : ''}" th:aria-current="${calendar.view == option ? 'page' : null}" th:text="${#strings.capitalize(option)}">Month</a></div>
+            <form class="calendar-date-picker" method="get" action="/calendar"><input type="hidden" name="view" th:value="${calendar.view}"><label for="calendar-date">Go to date</label><input id="calendar-date" type="date" name="date" th:value="${calendar.selectedDate}"><button class="button button-quiet" type="submit">Go</button></form>
+        </div>
+        <div th:if="${calendar.view == 'month'}" class="calendar-month" role="grid" th:aria-label="${calendar.title + ' month view'}">
+            <div class="calendar-weekday" role="columnheader">Mon</div><div class="calendar-weekday" role="columnheader">Tue</div><div class="calendar-weekday" role="columnheader">Wed</div><div class="calendar-weekday" role="columnheader">Thu</div><div class="calendar-weekday" role="columnheader">Fri</div><div class="calendar-weekday" role="columnheader">Sat</div><div class="calendar-weekday" role="columnheader">Sun</div>
+            <section class="calendar-day-cell" role="gridcell" th:each="day : ${calendar.days}" th:classappend="${(day.currentMonth ? '' : 'is-outside') + (day.today ? ' is-today' : '')}">
+                <a class="calendar-day-number" th:href="@{/calendar(view='day',date=${day.date})}" th:aria-label="${'Open ' + #temporals.format(day.date, 'EEEE, MMMM d')}"><span th:text="${day.date.dayOfMonth}">1</span><span class="calendar-count" th:if="${!#lists.isEmpty(day.events)}" th:text="${day.events.size()}">2</span></a>
+                <ul class="calendar-event-chips"><li th:each="event : ${day.visibleEvents()}"><a th:href="${event.href}" th:classappend="${' event-' + #strings.toLowerCase(event.type)}" th:title="${event.title + ' · ' + event.timeLabel()}" th:text="${event.title}">Task deadline</a></li></ul>
+                <a class="calendar-more" th:if="${day.moreCount() > 0}" th:href="@{/calendar(view='day',date=${day.date})}" th:text="${'+' + day.moreCount() + ' more'}">+2 more</a>
+            </section>
+        </div>
+        <div th:if="${calendar.view == 'month'}" class="calendar-mobile-list" aria-label="Events by day">
+            <article th:each="day : ${calendar.days}" class="calendar-mobile-day" th:classappend="${(day.currentMonth ? '' : 'is-outside') + (day.today ? ' is-today' : '')}"><a class="calendar-mobile-date" th:href="@{/calendar(view='day',date=${day.date})}" th:text="${#temporals.format(day.date, 'EEE, MMM d')}">Mon, Oct 20</a><ul class="calendar-mobile-events"><li th:each="event : ${day.events}"><a th:href="${event.href}" th:text="${event.title}">Event</a><small th:text="${event.type == 'TIME_BLOCK' ? event.timeLabel() : (event.type == 'TASK_DEADLINE' ? 'Deadline' : 'Milestone')}">Deadline</small></li><li class="calendar-empty-label" th:if="${#lists.isEmpty(day.events)}">No events</li></ul></article>
+        </div>
+        <div th:if="${calendar.view != 'month'}" class="calendar-agenda">
+            <section class="calendar-agenda-day" th:each="day : ${calendar.days}" th:classappend="${day.today ? ' is-today' : ''}" th:attr="data-calendar-date=${day.date}">
+                <header class="calendar-agenda-heading"><a th:href="@{/calendar(view='day',date=${day.date})}" th:text="${#temporals.format(day.date, 'EEEE, MMMM d')}">Monday, October 20</a><span th:text="${day.events.size() + ' events'}">0 events</span></header>
+                <div class="calendar-all-day-events"><a th:each="event : ${day.allDayEvents()}" th:href="${event.href}" th:classappend="${' event-' + #strings.toLowerCase(event.type)}"><span class="calendar-event-dot" aria-hidden="true"></span><span th:text="${event.title}">Deadline</span><small th:text="${event.type == 'MILESTONE' ? 'Milestone' : 'Task deadline'}">Deadline</small></a><p th:if="${#lists.isEmpty(day.allDayEvents())}" class="calendar-empty-label">No all-day events</p></div>
+                <div class="calendar-hour-grid" aria-label="Hourly schedule">
+                    <div class="calendar-hour-row" th:each="hour : ${hourRows}"><time th:text="${hour < 10 ? '0' + hour : hour} + ':00'">09:00</time><div class="calendar-hour-slot"><button type="button" class="calendar-create-slot" data-calendar-create-slot th:attr="data-hour=${hour},aria-label=${'Create time block at ' + hour + ':00 on ' + day.date}">+</button><a th:each="event : ${day.timedEvents()}" th:if="${event.start.hour == hour}" th:href="${event.href}" class="calendar-block-event" th:classappend="${' event-' + #strings.toLowerCase(event.type)}" th:attr="data-calendar-block=${event.type == 'TIME_BLOCK' ? event.timeBlockId : null},data-version=${event.version},data-start=${event.start},data-end=${event.end},draggable=${event.type == 'TIME_BLOCK'}"><strong th:text="${event.title}">Work block</strong><span th:text="${event.timeLabel()}">09:00–10:00</span><span class="sr-only" th:text="${event.type == 'TIME_BLOCK' ? 'Planned time block' : 'Task deadline'}">Schedule event</span></a></div></div>
+                </div>
+                <ul class="calendar-mobile-timed"><li th:each="event : ${day.timedEvents()}"><a th:href="${event.href}" th:text="${event.title}">Block</a><span th:text="${event.timeLabel()}">09:00–10:00</span></li><li class="calendar-empty-label" th:if="${#lists.isEmpty(day.timedEvents())}">No timed events</li></ul>
+            </section>
+            <p class="muted-text">The timeline shows scheduled items. It does not imply that unreserved time is available.</p>
+        </div>
+        <p class="calendar-legend"><span class="legend-dot legend-deadline"></span>Task deadline <span class="legend-dot legend-block"></span>Time block <span class="legend-dot legend-milestone"></span>Project milestone</p>
+    </section>
+    <section class="time-panel time-form-panel" id="new-time-block" aria-labelledby="new-block-heading"><div class="time-panel-heading"><div><p class="eyebrow eyebrow-muted">PLAN A WORK PERIOD</p><h2 id="new-block-heading">Add a time block</h2><p>Blocks reserve time but do not change the task due date.</p></div></div>
+        <form class="time-form-grid" method="post" th:action="@{/time/blocks}" th:object="${timeBlockForm}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="returnTo" value="calendar"><input type="hidden" name="view" th:value="${calendar.view}"><input type="hidden" name="date" th:value="${calendar.selectedDate}">
+            <div class="form-field"><label for="block-title">Title</label><input id="block-title" type="text" maxlength="160" th:field="*{title}" placeholder="Focused work" required></div>
+            <div class="form-field"><label for="block-task">Task <span class="muted-text">(optional)</span></label><select id="block-task" th:field="*{taskId}"><option value="">Personal activity</option><option th:each="task : ${taskOptions}" th:value="${task.id}" th:text="${task.title}">Task</option></select></div>
+            <div class="form-field"><label for="block-start">Start</label><input id="block-start" type="datetime-local" th:field="*{startAt}" required></div>
+            <div class="form-field"><label for="block-end">End</label><input id="block-end" type="datetime-local" th:field="*{endAt}" required></div>
+            <div class="form-field time-form-wide"><label for="block-notes">Notes <span class="muted-text">(optional)</span></label><input id="block-notes" type="text" maxlength="1200" th:field="*{notes}" placeholder="What will you work on?"></div>
+            <button class="button button-primary" type="submit">Save time block</button>
+        </form>
+    </section>
+</main></body></html>

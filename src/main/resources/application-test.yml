@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${TASKOS_TEST_DB_URL:jdbc:h2:mem:taskos_test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  thymeleaf:
+    cache: false
+  flyway:
+    enabled: true
+  jpa:
+    show-sql: false
+
+taskos:
+  ai:
+    execution:
+      enabled: false
+
+logging:
+  level:
+    com.taskos: WARN

@@ -1,0 +1,126 @@
+.schedule-page { max-width: 1320px; }
+.schedule-page .project-tabs { overflow-x: auto; }
+.schedule-page .project-tabs a { white-space: nowrap; }
+.schedule-flash { margin: 0 0 12px; padding: 12px 15px; border: 1px solid #99f6e4; border-radius: 10px; color: #134e4a; background: #f0fdfa; font-size: 13px; }
+.schedule-flash-error { border-color: #fecaca; color: #991b1b; background: #fef2f2; }
+.schedule-intro .project-section-heading { align-items: flex-start; }
+.schedule-zoom { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft, #f4f6fa); }
+.schedule-zoom button { min-width: 48px; min-height: 38px; border: 0; border-radius: 7px; color: var(--muted); background: transparent; cursor: pointer; font: inherit; font-size: 12px; }
+.schedule-zoom button[aria-pressed="true"] { color: var(--ink); background: var(--surface, #fff); box-shadow: 0 1px 3px #0f172a18; }
+.schedule-zoom button:focus-visible, .schedule-page a:focus-visible, .schedule-page button:focus-visible, .schedule-page summary:focus-visible { outline: 3px solid #0d9488; outline-offset: 3px; }
+.schedule-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
+.schedule-metrics > div { display: grid; gap: 5px; min-width: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; }
+.schedule-metrics span, .schedule-read-only > span { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.schedule-metrics strong { overflow-wrap: anywhere; color: var(--ink); font-size: 17px; }
+.schedule-readiness { display: grid; gap: 7px; margin: 12px 0; padding: 12px 14px; border-left: 3px solid #d97706; border-radius: 6px; color: var(--ink-soft, #334155); background: #fffbeb; font-size: 13px; }
+.schedule-readiness ul { display: grid; gap: 4px; margin: 0; padding-left: 20px; }
+.schedule-policy { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.schedule-preview { border-color: #fbbf24; }
+.schedule-preview > form { margin-top: 14px; }
+.schedule-zoom { flex: 0 0 auto; }
+.gantt-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0 0 14px; color: var(--muted); font-size: 11px; }
+.gantt-legend > span { display: inline-flex; align-items: center; gap: 7px; }
+.gantt-legend i { width: 17px; height: 8px; border-radius: 5px; background: #0d9488; }
+.gantt-legend .gantt-legend-critical { background: #c2410c; }
+.gantt-legend .gantt-legend-baseline { height: 3px; border: 1px dashed #475569; background: transparent; }
+.gantt-legend .gantt-legend-milestone { width: 16px; color: #7c3aed; font-style: normal; font-size: 13px; }
+.gantt-scroll { max-width: 100%; overflow: auto; border: 1px solid var(--line); border-radius: 11px; scrollbar-gutter: stable; }
+.gantt-chart { --plot-width: 900px; --day-width: 8px; position: relative; width: max-content; min-width: 100%; color: var(--ink); }
+.gantt-chart-head, .gantt-row { display: grid; grid-template-columns: 250px var(--plot-width); width: max-content; min-width: 100%; }
+.gantt-chart-head { position: sticky; top: 0; z-index: 3; min-height: 47px; border-bottom: 1px solid var(--line); background: var(--surface, #fff); }
+.gantt-task-column { position: sticky; left: 0; z-index: 4; display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--line); background: var(--surface, #fff); font-size: 11px; }
+.gantt-axis { position: relative; width: var(--plot-width); height: 47px; overflow: hidden; }
+.gantt-axis-tick { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 7px; border-left: 1px solid var(--line); color: var(--muted); font-size: 10px; white-space: nowrap; }
+.gantt-milestone-axis { position: absolute; top: 27px; z-index: 2; transform: translateX(-50%); color: #7c3aed; font-size: 12px; }
+.gantt-chart-body { position: relative; width: max-content; min-width: 100%; }
+.gantt-row { min-height: 54px; border-bottom: 1px solid var(--line); background: var(--surface, #fff); }
+.gantt-row:last-of-type { border-bottom: 0; }
+.gantt-task-label { position: sticky; left: 0; z-index: 1; display: grid; align-content: center; gap: 3px; min-width: 0; padding: 7px 13px; border-right: 1px solid var(--line); background: var(--surface, #fff); }
+.gantt-task-label > a { overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-task-label > span { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-lane { position: relative; width: var(--plot-width); min-height: 54px; background-image: linear-gradient(to right, color-mix(in srgb, var(--line) 72%, transparent) 1px, transparent 1px); background-size: var(--day-width) 100%; }
+.gantt-bar { position: absolute; top: 16px; z-index: 1; display: flex; align-items: center; min-width: 7px; height: 22px; overflow: hidden; padding: 0 8px; border: 1px solid #0f766e; border-radius: 7px; color: #fff; background: #0d9488; box-shadow: 0 1px 2px #0f172a20; text-decoration: none; white-space: nowrap; }
+.gantt-bar.is-critical { border-color: #9a3412; background: #c2410c; }
+.gantt-bar > span { overflow: hidden; font-size: 10px; font-weight: 650; text-overflow: ellipsis; }
+.gantt-bar:hover { filter: brightness(.94); }
+.gantt-bar { cursor: grab; touch-action: none; user-select: none; }
+.gantt-bar.is-dragging { z-index: 5; cursor: grabbing; filter: brightness(.9); }
+.gantt-baseline-bar { position: absolute; top: 42px; z-index: 0; height: 3px; border-top: 2px dashed #475569; pointer-events: none; }
+.gantt-dependency-layer { position: absolute; inset: 0 auto auto 0; z-index: 2; pointer-events: none; overflow: visible; }
+.gantt-dependency-layer path { fill: none; stroke: #64748b; stroke-width: 1.5; marker-end: url(#gantt-arrow); }
+.gantt-dependency-layer path.is-critical { stroke: #c2410c; stroke-width: 2.25; }
+.gantt-dependency-layer marker path { fill: #64748b; stroke: none; }
+.gantt-dependency-layer marker path.is-critical { fill: #c2410c; }
+.gantt-unplanned { position: absolute; top: 19px; left: 8px; color: var(--muted); font-size: 10px; }
+.schedule-empty { margin: 10px 0 0; padding: 14px; border-radius: 9px; color: var(--muted); background: var(--surface-soft, #f4f6fa); font-size: 12px; }
+.schedule-table-wrap { width: 100%; overflow-x: auto; margin-top: 14px; }
+.schedule-table-wrap > h3 { margin: 0 0 8px; font-size: 14px; }
+.schedule-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.schedule-table th, .schedule-table td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.schedule-table thead { color: var(--muted); background: var(--surface-soft, #f7f8fc); font-size: 10px; }
+.schedule-table th[scope="row"] { color: var(--ink); font-weight: 650; }
+.schedule-table td { color: var(--ink-soft, #334155); }
+.schedule-table a { color: var(--primary, #0d9488); }
+.schedule-table td small { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
+.schedule-editor { border-top: 1px solid var(--line); }
+.schedule-editor:last-of-type { border-bottom: 1px solid var(--line); }
+.schedule-editor summary { display: flex; justify-content: space-between; gap: 10px; min-height: 45px; align-items: center; cursor: pointer; color: var(--ink); font-size: 12px; font-weight: 650; list-style-position: inside; }
+.schedule-editor summary > span:last-child { color: var(--muted); font-size: 11px; font-weight: 500; }
+.schedule-editor-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding: 0 0 13px 22px; }
+.schedule-editor-form label, .schedule-baseline-form label, .dependency-editor label { display: grid; flex: 1 1 170px; gap: 6px; color: var(--ink-soft, #334155); font-size: 11px; font-weight: 650; }
+.schedule-editor-form input, .schedule-baseline-form input, .dependency-editor input, .dependency-editor select { min-width: 0; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface, #fff); font: inherit; }
+.schedule-editor-form label small { color: var(--muted); font-size: 10px; font-weight: 400; line-height: 1.4; }
+.schedule-read-only { display: grid; gap: 3px; padding: 7px 10px; border-left: 2px solid #0d9488; background: var(--surface-soft, #f4f6fa); }
+.schedule-read-only strong { color: var(--ink); font-size: 12px; }
+.schedule-read-only small { color: var(--muted); font-size: 10px; }
+.schedule-archived-note { color: var(--muted); font-size: 12px; }
+.schedule-baseline-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.schedule-baseline-list { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 12px; }
+.schedule-baseline-list > a { display: grid; gap: 3px; min-width: 190px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--surface, #fff); text-decoration: none; }
+.schedule-baseline-list > a.is-selected { border-color: #0d9488; box-shadow: inset 0 0 0 1px #0d9488; }
+.schedule-baseline-list > a > span, .schedule-baseline-list > a > small { color: var(--muted); font-size: 10px; }
+.schedule-milestone-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.schedule-milestone-list li { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; align-items: center; gap: 9px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.milestone-diamond { color: #7c3aed; }
+.schedule-milestone-list li > div { display: grid; gap: 2px; }
+.schedule-milestone-list li strong { color: var(--ink); font-size: 12px; }
+.schedule-milestone-list li span:not(.milestone-diamond), .schedule-milestone-list li small { color: var(--muted); font-size: 10px; }
+.dependency-summary { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 0 0 12px; color: var(--muted); font-size: 11px; }
+.dependency-summary strong { color: var(--ink); }
+.dependency-editor { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.dependency-editor select { width: 100%; }
+.dependency-editor .button { min-height: 42px; }
+.dependency-graph-scroll { max-width: 100%; overflow: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: 11px; background: var(--surface, #fff); }
+.dependency-graph { position: relative; width: 1100px; min-height: 140px; overflow: hidden; background-image: linear-gradient(to right, var(--line) 1px, transparent 1px); background-size: 25% 100%; }
+.dependency-graph-lines { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.dependency-graph-lines path { fill: none; stroke: #64748b; stroke-width: 1.5; marker-end: url(#dependency-arrow); }
+.dependency-graph-lines path.is-critical { stroke: #c2410c; stroke-width: 2.25; }
+.dependency-graph-lines marker path { fill: #64748b; stroke: none; }
+.dependency-graph-node { position: absolute; z-index: 1; display: grid; gap: 4px; width: 190px; min-height: 62px; padding: 10px 12px; transform: translateX(-50%); border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--surface, #fff); box-shadow: 0 2px 6px #0f172a10; text-decoration: none; }
+.dependency-graph-node.is-critical { border-color: #c2410c; box-shadow: inset 3px 0 #c2410c, 0 2px 6px #0f172a10; }
+.dependency-graph-node strong { overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.dependency-graph-node span, .dependency-graph-node small { color: var(--muted); font-size: 10px; }
+.dependency-graph-node small { color: #9a3412; font-weight: 700; }
+@media (max-width: 760px) {
+  .schedule-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .schedule-page .project-section-heading { align-items: flex-start; flex-direction: column; }
+  .schedule-zoom { align-self: flex-start; }
+  .gantt-chart-head, .gantt-row { grid-template-columns: 195px var(--plot-width); }
+  .gantt-task-column, .gantt-task-label { width: 195px; }
+  .gantt-dependency-layer { left: 0; }
+  .schedule-milestone-list li { grid-template-columns: 20px minmax(0,1fr); }
+  .schedule-milestone-list li > small { grid-column: 2; }
+}
+@media (max-width: 440px) {
+  .schedule-metrics { grid-template-columns: 1fr 1fr; }
+  .schedule-metrics > div { padding: 10px; }
+  .schedule-metrics strong { font-size: 14px; }
+  .schedule-editor-form { padding-left: 8px; }
+  .schedule-editor-form label { flex-basis: 100%; }
+  .schedule-table { min-width: 680px; }
+  .gantt-chart-head, .gantt-row { grid-template-columns: 170px var(--plot-width); }
+  .gantt-task-column, .gantt-task-label { width: 170px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .schedule-page *, .schedule-page *::before, .schedule-page *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

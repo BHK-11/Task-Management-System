@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Browser Studio — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content browser-studio-page">
+    <header class="browser-welcome">
+        <div><p class="eyebrow eyebrow-muted">PHASE 18 · READ-ONLY BROWSER</p><h1>Browser Studio</h1><p>Open an approved public page and inspect its visible text in an isolated, one-use browser context.</p></div>
+        <span class="browser-mode-pill"><span aria-hidden="true"></span>Read-only mode</span>
+    </header>
+    <p class="account-notice" role="status" th:if="${browserNotice}" th:text="${browserNotice}">Updated.</p>
+    <p class="browser-error" role="alert" th:if="${browserError}" th:text="${browserError}">The page could not be observed.</p>
+    <section class="browser-panel" aria-labelledby="browser-open-title">
+        <div class="browser-panel-heading"><div><p class="eyebrow eyebrow-muted">DETERMINISTIC PLAYWRIGHT</p><h2 id="browser-open-title">Observe a public website</h2></div><span class="browser-status" th:classappend="${browserConfigured ? 'is-ready' : 'is-offline'}" th:text="${browserConfigured ? 'Worker configured' : 'Worker not configured'}">Worker not configured</span></div>
+        <form th:action="@{/browser/observe}" method="post" class="browser-observe-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label for="browser-url">HTTPS page URL</label>
+            <div class="browser-url-row"><input id="browser-url" name="url" type="url" required maxlength="2048" autocomplete="url" placeholder="https://docs.example.org/guide" th:value="${browserObserveForm.url}"><button type="submit" class="button button-primary" th:disabled="${!browserConfigured}">Read page</button></div>
+            <p class="browser-note">Only operator-approved HTTPS origins work. URLs with query parameters, fragments, login state, and non-standard ports are blocked. This does not sign in, click, submit, download, or upload.</p>
+        </form>
+        <p class="browser-setup-note" th:if="${!browserConfigured}">The private worker is not configured. Set its service URL and matching private token in both processes, then allow exact public origins in the worker.</p>
+    </section>
+
+    <section class="browser-panel browser-observation" th:if="${observation != null}" aria-labelledby="observation-title">
+        <div class="browser-panel-heading"><div><p class="eyebrow eyebrow-muted">VERIFIED BROWSER OBSERVATION</p><h2 id="observation-title" th:text="${observation.title}">Page title</h2></div><span class="browser-status is-ready">Read completed</span></div>
+        <p class="browser-note"><strong>Origin:</strong> <span th:text="${observation.origin}">https://example.org</span> · Observed <time th:datetime="${observation.observedAt}" th:text="${observation.observedAt}">Time</time></p>
+        <p class="browser-note" th:if="${observation.blockedRequestCount > 0}" th:text="${observation.blockedRequestCount + ' cross-origin, non-public, or over-budget requests were blocked.'}">Blocked requests</p>
+        <div th:if="${!#lists.isEmpty(observation.headings)}"><h3>Headings</h3><ul class="browser-headings"><li th:each="heading : ${observation.headings}" th:text="${heading}">Heading</li></ul></div>
+        <h3>Visible page text</h3><pre class="browser-visible-text" th:text="${observation.visibleText}">Page text</pre>
+        <p class="browser-untrusted-note">Page text is untrusted website content. TASK OS did not interpret it as an instruction or run any page action.</p>
+    </section>
+
+    <section class="browser-panel" aria-labelledby="browser-history-title">
+        <div class="browser-panel-heading"><div><p class="eyebrow eyebrow-muted">OWNER-ONLY METADATA</p><h2 id="browser-history-title">Recent observations</h2></div><span class="browser-count" th:text="${#lists.size(browserJobs) + ' of 20 recent'}">0 of 20 recent</span></div>
+        <p class="browser-empty" th:if="${#lists.isEmpty(browserJobs)}">No browser observations yet. History stores only the origin, result title, status, timestamp, and safe error code.</p>
+        <ul class="browser-history" th:if="${!#lists.isEmpty(browserJobs)}">
+            <li th:each="job : ${browserJobs}" class="browser-history-item">
+                <div class="browser-history-copy"><strong th:text="${job.origin}">https://example.org</strong><span class="browser-history-title" th:if="${job.pageTitle != null}" th:text="${job.pageTitle}">Page title</span><span class="browser-status" th:classappend="${job.status.name() == 'COMPLETED' ? 'is-ready' : (job.status.name() == 'DENIED' ? 'is-denied' : 'is-failed')}" th:text="${job.status}">FAILED</span><small><time th:datetime="${job.createdAt}" th:text="${job.createdAt}">Time</time><span th:if="${job.errorCode != null}" th:text="${' · ' + job.errorCode}"> · Error</span></small></div>
+                <form method="post" th:action="@{/browser/history/{id}/delete(id=${job.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-quiet browser-delete" type="submit">Delete</button></form>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

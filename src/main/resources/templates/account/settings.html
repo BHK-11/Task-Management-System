@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Account settings — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content account-content">
+    <section class="workspace-welcome account-welcome"><div><p class="eyebrow eyebrow-muted">ACCOUNT PREFERENCES</p><h1>Account settings</h1><p>Choose how TASK OS should present your workspace.</p></div><div class="account-actions"><a class="button button-quiet" th:href="@{/settings/ai}">AI model settings</a><a class="phase-pill account-phase-link" th:href="@{/profile}">Profile <span aria-hidden="true">→</span></a></div></section>
+    <p class="account-notice" role="status" th:if="${param.updated}">Your preferences were saved to your account.</p>
+    <section class="account-card" aria-labelledby="preferences-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">PRESENTATION</p><h2 id="preferences-title">Workspace preferences</h2></div></div>
+        <form th:action="@{/settings/account}" method="post" th:object="${preferencesForm}" class="account-form" data-auth-form>
+            <div class="form-field"><label for="displayName">Display name</label><input id="displayName" type="text" autocomplete="name" maxlength="80" required th:field="*{displayName}" th:attr="aria-invalid=${#fields.hasErrors('displayName')}" aria-describedby="displayName-error"><p class="field-error" id="displayName-error" th:errors="*{displayName}"></p></div>
+            <div class="form-field"><label for="themePreference">Color theme</label><select id="themePreference" th:field="*{themePreference}" aria-describedby="theme-help"><option value="SYSTEM">Match device</option><option value="LIGHT">Light</option><option value="DARK">Dark</option></select><p class="field-hint" id="theme-help">This preference is saved to your account and follows you across sign-ins.</p></div>
+            <div class="form-field"><label for="timezone">Timezone</label><select id="timezone" th:field="*{timezone}" th:attr="aria-invalid=${#fields.hasErrors('timezone')}" aria-describedby="timezone-error"><option value="UTC">UTC</option><option value="Asia/Kolkata">India Standard Time (Kolkata)</option><option value="America/Los_Angeles">Pacific Time (Los Angeles)</option><option value="America/New_York">Eastern Time (New York)</option><option value="Europe/London">United Kingdom (London)</option></select><p class="field-error" id="timezone-error" th:errors="*{timezone}"></p></div>
+            <div class="form-field"><label for="locale">Language</label><select id="locale" th:field="*{locale}"><option value="en">English</option></select><p class="field-hint">Additional languages are not available in this phase.</p></div>
+            <div class="account-actions"><button type="submit" class="button button-primary" data-submit-button><span data-submit-label data-working-label="Saving…">Save preferences</span></button><a class="button button-quiet" th:href="@{/profile}">Back to profile</a></div>
+        </form>
+    </section>
+    <section class="account-card account-security-link"><div><p class="eyebrow eyebrow-muted">KEEP YOUR ACCOUNT SAFE</p><h2>Sign-in security</h2><p>Update your password from time to time and sign out on shared devices.</p></div><a class="button button-quiet" th:href="@{/settings/security}">Security settings <span aria-hidden="true">→</span></a></section>
+</main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">Members — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <div class="task-flash" role="status" th:if="${taskMessage}" th:text="${taskMessage}"></div>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <a class="project-back-link" th:href="@{/workspaces/{id}(id=${workspace.id})}">← <span th:text="${workspace.name}">Workspace</span></a>
+    <header class="project-heading"><div><p class="eyebrow">WORKSPACE ACCESS</p><h1>Members &amp; invitations</h1><p>Only active members can open this workspace. Roles are enforced on the server for every action.</p></div><a class="button button-quiet" th:href="@{/workspaces/{id}/workload(id=${workspace.id})}">View workload</a></header>
+    <section class="team-member-list" aria-label="Active members">
+        <article class="team-member-row" th:each="member : ${members}">
+            <span class="user-avatar team-member-avatar" aria-hidden="true" th:text="${#strings.substring(member.user.displayName, 0, 1).toUpperCase()}">A</span>
+            <span class="team-member-main"><strong th:text="${member.user.displayName}">Member</strong><small>Active member</small></span>
+            <span class="team-role" th:text="${member.role}">MEMBER</span><time th:text="${#temporals.format(member.joinedAt, 'MMM d, yyyy')}">Joined date</time>
+            <div class="team-member-actions" th:if="${canManage and member.role.name() != 'OWNER'}">
+                <form method="post" th:action="@{/workspaces/{workspaceId}/members/{memberId}/role(workspaceId=${workspace.id},memberId=${member.user.id})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label class="sr-only" th:for="${'role-' + member.user.id}">Role for this member</label>
+                    <select th:id="${'role-' + member.user.id}" name="role" th:disabled="${workspace.status.name() != 'ACTIVE'}">
+                        <option th:each="role : ${roles}" th:value="${role}" th:selected="${role == member.role}" th:text="${role}">MEMBER</option>
+                    </select><button class="button button-quiet button-small" type="submit" th:disabled="${workspace.status.name() != 'ACTIVE'}">Save role</button>
+                </form>
+                <form th:if="${canOwn}" method="post" th:action="@{/workspaces/{workspaceId}/members/{memberId}/transfer-ownership(workspaceId=${workspace.id},memberId=${member.user.id})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-quiet button-small" type="submit" th:disabled="${workspace.status.name() != 'ACTIVE'}">Make owner</button>
+                </form>
+                <form method="post" th:action="@{/workspaces/{workspaceId}/members/{memberId}/remove(workspaceId=${workspace.id},memberId=${member.user.id})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-danger button-small" type="submit" th:disabled="${workspace.status.name() != 'ACTIVE'}">Remove</button>
+                </form>
+            </div>
+        </article>
+    </section>
+    <section class="project-panel team-notification-preferences" aria-labelledby="notification-preferences-title">
+        <div class="team-section-head"><div><p class="eyebrow">YOUR INBOX</p><h2 id="notification-preferences-title">Notification preferences</h2><p>Choose which workspace updates appear in your TASK OS inbox.</p></div></div>
+        <form class="team-notification-preferences-form" th:if="${workspace.status.name() == 'ACTIVE'}" method="post" th:action="@{/workspaces/{id}/notifications/preferences(id=${workspace.id})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <label class="team-notification-option"><input type="checkbox" name="notifyAssignments" value="true" th:checked="${currentMembership.notifyAssignments}"><span><strong>Task assignments</strong><small>When someone assigns or reassigns a task to you.</small></span></label>
+            <label class="team-notification-option"><input type="checkbox" name="notifyMentions" value="true" th:checked="${currentMembership.notifyMentions}"><span><strong>Direct mentions</strong><small>When someone mentions you in a task comment.</small></span></label>
+            <label class="team-notification-option"><input type="checkbox" name="notifyActivity" value="true" th:checked="${currentMembership.notifyActivity}"><span><strong>Workspace activity</strong><small>Updates to settings, membership, assignments, task status, and comments.</small></span></label>
+            <button class="button button-quiet" type="submit">Save preferences</button>
+        </form>
+        <p class="team-private-note" th:if="${workspace.status.name() != 'ACTIVE'}">Archived workspaces are read-only. Notification preferences cannot be changed until the workspace is restored.</p>
+    </section>
+    <section class="team-section team-two-column" th:if="${canManage}">
+        <div class="project-panel team-invite-panel">
+            <p class="eyebrow">INVITE A COLLEAGUE</p><h2>Create a secure invite link</h2>
+            <p>No email provider is configured, so TASK OS will not send an email. The link expires in seven days and accepts only the intended account email.</p>
+            <form class="team-form" method="post" th:action="@{/workspaces/{id}/invitations(id=${workspace.id})}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <label for="invite-email">Email address</label><input id="invite-email" name="email" type="email" maxlength="254" autocomplete="email" required>
+                <label for="invite-role">Workspace role</label><select id="invite-role" name="role" required><option th:each="role : ${roles}" th:value="${role}" th:text="${role}">MEMBER</option></select>
+                <button class="button button-primary" type="submit" th:disabled="${workspace.status.name() != 'ACTIVE'}">Generate invite link</button>
+            </form>
+            <div class="team-invite-result" role="status" th:if="${inviteLink}"><strong>Copy this one-time link</strong><code th:text="${inviteLink}">/invitations/token</code><small>The raw token is only shown in this response. No email was sent.</small></div>
+        </div>
+        <div class="project-panel">
+            <div class="team-section-head"><div><p class="eyebrow">INVITATION HISTORY</p><h2>Invitations</h2></div></div>
+            <div class="team-invitation-list" th:if="${!invitations.empty}">
+                <article class="team-invitation-row" th:each="invitation : ${invitations}">
+                    <span><strong th:text="${invitation.invitedEmail}">member@example.test</strong><small th:text="${invitation.intendedRole + ' · expires ' + #temporals.format(invitation.expiresAt, 'MMM d, yyyy')}">MEMBER</small></span>
+                    <span class="team-invite-status" th:text="${invitation.status}">PENDING</span>
+                    <form th:if="${invitation.status.name() == 'PENDING'}" method="post" th:action="@{/workspaces/{workspaceId}/invitations/{invitationId}/revoke(workspaceId=${workspace.id},invitationId=${invitation.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button button-danger button-small" type="submit">Revoke</button>
+                    </form>
+                </article>
+            </div>
+            <div class="team-empty-inline" th:if="${invitations.empty}"><strong>No invitations yet</strong><span>Created, accepted and expired invitations will be listed here.</span></div>
+        </div>
+    </section>
+</main></body></html>

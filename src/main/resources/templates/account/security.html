@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title>Security settings — TASK OS</title></head>
+<body>
+<main id="main-content" class="workspace-content account-content">
+    <section class="workspace-welcome account-welcome"><div><p class="eyebrow eyebrow-muted">ACCOUNT SECURITY</p><h1>Security settings</h1><p>Change the password used to access your TASK OS account.</p></div><a class="phase-pill account-phase-link" th:href="@{/settings/account}">Account settings <span aria-hidden="true">→</span></a></section>
+    <section class="account-card" aria-labelledby="change-password-title">
+        <div class="account-card-heading"><div><p class="eyebrow eyebrow-muted">PASSWORD</p><h2 id="change-password-title">Change your password</h2></div></div>
+        <p class="account-copy">Use at least 12 characters. A longer passphrase is a good choice. After you change it, you’ll sign in again with the new password.</p>
+        <form th:action="@{/settings/security/password}" method="post" th:object="${passwordChangeForm}" class="account-form" data-auth-form>
+            <div class="form-error-summary" role="status" aria-live="polite" th:if="${#fields.hasAnyErrors()}">Please review the highlighted fields.</div>
+            <div class="form-field"><label for="currentPassword">Current password</label><div class="password-input-wrap"><input id="currentPassword" type="password" autocomplete="current-password" maxlength="256" required th:field="*{currentPassword}" th:attr="aria-invalid=${#fields.hasErrors('currentPassword')}" aria-describedby="currentPassword-error"><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="currentPassword" data-password-toggle>Show</button></div><p class="field-error" id="currentPassword-error" th:errors="*{currentPassword}"></p></div>
+            <div class="form-field"><label for="newPassword">New password</label><div class="password-input-wrap"><input id="newPassword" type="password" autocomplete="new-password" minlength="12" maxlength="256" required th:field="*{newPassword}" th:attr="aria-invalid=${#fields.hasErrors('newPassword')}" aria-describedby="newPassword-error"><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="newPassword" data-password-toggle>Show</button></div><p class="field-error" id="newPassword-error" th:errors="*{newPassword}"></p></div>
+            <div class="form-field"><label for="confirmPassword">Confirm new password</label><div class="password-input-wrap"><input id="confirmPassword" type="password" autocomplete="new-password" maxlength="256" required th:field="*{confirmPassword}" th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')}" aria-describedby="confirmPassword-error"><button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false" aria-controls="confirmPassword" data-password-toggle>Show</button></div><p class="field-error" id="confirmPassword-error" th:errors="*{confirmPassword}"></p></div>
+            <div class="account-actions"><button type="submit" class="button button-primary" data-submit-button><span data-submit-label data-working-label="Updating password…">Update password</span></button><a class="button button-quiet" th:href="@{/profile}">Cancel</a></div>
+        </form>
+    </section>
+    <section class="account-card account-security-link"><div><p class="eyebrow eyebrow-muted">SESSION</p><h2>Current sign-in</h2><p>Your session expires after 30 minutes of inactivity. Signing out ends this browser session.</p></div></section>
+</main>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/workspace :: layout(~{::title}, ~{::main})}">
+<head><title th:text="${pageTitle}">New workspace — TASK OS</title></head>
+<body><main id="main-content" class="workspace-content team-page">
+    <a class="project-back-link" th:href="@{/teams}">← Team workspaces</a>
+    <div class="task-flash task-flash-error" role="alert" th:if="${taskError}" th:text="${taskError}"></div>
+    <header class="project-heading"><div><p class="eyebrow">NEW SHARED SPACE</p><h1>Create a workspace</h1><p>You will become its first owner. No existing personal tasks or projects are shared automatically.</p></div></header>
+    <section class="project-panel team-form-panel"><form method="post" th:action="@{/workspaces}" class="team-form">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <label for="workspace-name">Workspace name</label><input id="workspace-name" name="name" maxlength="100" required autocomplete="organization" placeholder="e.g. Product launch">
+        <label for="workspace-description">Description <span class="team-optional">Optional</span></label><textarea id="workspace-description" name="description" rows="4" maxlength="1000" placeholder="What will this team work on?"></textarea>
+        <div class="team-form-actions"><a class="button button-quiet" th:href="@{/teams}">Cancel</a><button class="button button-primary" type="submit">Create workspace</button></div>
+    </form></section>
+</main></body></html>
